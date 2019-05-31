@@ -12,9 +12,9 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-final class Downloader implements Supplier<Optional<InputStream>> {
+final class XLSXDownloader implements Supplier<Optional<InputStream>> {
 
-    private static final Logger LOGGER = LogManager.getLogger(Downloader.class);
+    private static final Logger LOGGER = LogManager.getLogger(XLSXDownloader.class);
 
     private static URL assembleURL(final LocalDate date) {
         final String monthString = "0" + date.getMonthValue();
