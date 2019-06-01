@@ -39,7 +39,6 @@ final class XLSXDownloader implements Supplier<Optional<InputStream>> {
                 return Optional.of(loanbookUrl.openStream());
             } catch (final IOException e) {
                 LOGGER.debug("Failed opening loanbook for " + monthToCheck, e);
-                e.printStackTrace();
             }
         }
         LOGGER.error("No recent loanbook available for download.");

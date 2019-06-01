@@ -27,7 +27,7 @@ final class XLSXConverter implements Function<InputStream, String[][]> {
                 final List<String> rowCells = new ArrayList<>();
                 for (int colId = 0; colId <= row.getLastCellNum(); colId++) {
                     var cell = row.getCell(colId);
-                    objFormulaEvaluator.evaluate(cell); // This will evaluate the cell, And any type of cell will return string value
+                    objFormulaEvaluator.evaluate(cell);
                     var cellValue = objDefaultFormat.formatCellValue(cell, objFormulaEvaluator);
                     rowCells.add(cellValue);
                 }

@@ -1,4 +1,4 @@
-package com.github.robozonky.loanbook.model;
+package com.github.robozonky.loanbook.input;
 
 import java.time.LocalDate;
 import java.time.YearMonth;

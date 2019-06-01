@@ -1,4 +1,4 @@
-package com.github.robozonky.loanbook.model;
+package com.github.robozonky.loanbook.input;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -144,4 +145,9 @@ public final class Data {
     private void addRow(final DataRow row) {
         rows.add(row);
     }
+
+    public Stream<DataRow> getAll() {
+        return rows.stream();
+    }
+
 }
