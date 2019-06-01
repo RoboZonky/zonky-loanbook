@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import io.vavr.Lazy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +19,10 @@ public final class Data {
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("[\\s\\h]+");
     private final Set<DataRow> rows = new CopyOnWriteArraySet<>();
+    private final Lazy<YearMonth> yearMonth = Lazy.of(() -> getAll().map(DataRow::getOrigin)
+            .map(YearMonth::from)
+            .max(YearMonth::compareTo)
+            .orElse(YearMonth.from(LocalDate.now())));
 
     public static Data process(final String[][] sheet) {
         final Data data = new Data();
@@ -146,8 +151,11 @@ public final class Data {
         rows.add(row);
     }
 
+    public YearMonth getYearMonth() {
+        return yearMonth.get();
+    }
+
     public Stream<DataRow> getAll() {
         return rows.stream();
     }
-
 }

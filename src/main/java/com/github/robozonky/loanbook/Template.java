@@ -7,21 +7,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.function.Function;
 
 import com.github.robozonky.loanbook.charts.Chart;
 import com.github.robozonky.loanbook.charts.ChartType;
 import com.github.robozonky.loanbook.charts.XYChart;
+import com.github.robozonky.loanbook.input.Data;
 import freemarker.template.Configuration;
 
 final class Template implements Runnable {
 
     private final List<Chart> charts = new ArrayList<>(0);
+    private final Data data;
 
-    public void addPieChart(final String title, final String labelForX, final String labelForY,
-                            final SortedMap<? extends Comparable<?>, ? extends Number> data) {
-        final XYChart chart = new XYChart(ChartType.PIE, title, labelForX, labelForY);
-        data.forEach((key, value) -> chart.add(key.toString(), value));
-        charts.add(chart);
+    public Template(final Data data) {
+        this.data = data;
     }
 
     private static Configuration getFreemarkerConfiguration(final Class<?> templateRoot) {
@@ -30,6 +30,17 @@ final class Template implements Runnable {
         cfg.setLogTemplateExceptions(false);
         cfg.setDefaultEncoding("UTF-8");
         return cfg;
+    }
+
+    private String addDateToTitle(final String title) {
+        return title + " (Zonky loanbook " + data.getYearMonth() + ")";
+    }
+
+    void addPieChart(final String title, final String labelForX, final String labelForY,
+                     final Function<Data, SortedMap<? extends Comparable<?>, ? extends Number>> processor) {
+        final XYChart chart = new XYChart(ChartType.PIE, addDateToTitle(title), labelForX, labelForY);
+        processor.apply(data).forEach((key, value) -> chart.add(key.toString(), value));
+        charts.add(chart);
     }
 
     @Override
@@ -43,6 +54,5 @@ final class Template implements Runnable {
         } catch (final Exception ex) {
             throw new IllegalStateException(ex);
         }
-
     }
 }
