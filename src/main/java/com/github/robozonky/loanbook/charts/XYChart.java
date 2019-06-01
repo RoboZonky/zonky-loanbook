@@ -1,4 +1,4 @@
-package com.github.robozonky.loanbook;
+package com.github.robozonky.loanbook.charts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,8 @@ public class XYChart extends Chart {
     private final List<Tuple2<String, Number>> data = new ArrayList<>(0);
 
 
-    public XYChart(final String title, final String labelForX, final String labelForY) {
-        super(title);
+    public XYChart(final ChartType type, final String title, final String labelForX, final String labelForY) {
+        super(type, title);
         this.labelForX = labelForX;
         this.labelForY = labelForY;
     }
@@ -31,7 +31,7 @@ public class XYChart extends Chart {
         return data;
     }
 
-    void add(final String x, final Number y) {
+    public void add(final String x, final Number y) {
         data.add(Tuple.of(x, y));
     }
 

@@ -1,4 +1,4 @@
-<#include "chart-pie.js.ftl">
+<#include "charts.js.ftl">
 <html>
     <head>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -7,19 +7,19 @@
           google.charts.setOnLoadCallback(drawCharts);
 
           <#list data.charts as chart>
-            <@pieChart chart />
+            <@chartFunction chart />
           </#list>
 
           function drawCharts() {
               <#list data.charts as chart>
-                  drawPieChart${chart.getId()}();
+                  <@chartFunctionName chart />();
               </#list>
           }
         </script>
     </head>
     <body>
         <#list data.charts as chart>
-            <@pieChartMeta chart />
+            <@chartMeta chart />
         </#list>
     </body>
 </html>

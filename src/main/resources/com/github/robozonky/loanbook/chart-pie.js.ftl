@@ -1,5 +1,5 @@
 <#macro pieChart chart>
-    function drawPieChart${chart.getId()}() {
+    function <@chartFunctionName chart />() {
         var data = google.visualization.arrayToDataTable([
             <#list chart.getData()>
                 ['${chart.getLabelForX()}', '${chart.getLabelForY()}'],
@@ -11,21 +11,14 @@
         var options = {
             title: '${chart.getTitle()}'
         };
-        var chart_div = document.getElementById('chart-pie-${chart.getId()}-interactive');
+        var chart_div = document.getElementById('<@htmlIdInteractive chart />');
         var chart = new google.visualization.PieChart(chart_div);
 
         google.visualization.events.addListener(chart, 'ready', function () {
-            document.getElementById('chart-pie-${chart.getId()}-png').outerHTML =
+            document.getElementById('<@htmlIdPng chart />').outerHTML =
             '<a href="' + chart.getImageURI() + '">Ke stažení</a>';
         });
 
         chart.draw(data, options);
     }
 </#macro>
-<#macro pieChartMeta chart>
-    <div id="chart-pie-${chart.getId()}">
-        <div id="chart-pie-${chart.getId()}-interactive" style="width: 640px; height: 480px;"></div>
-        <div id='chart-pie-${chart.getId()}-png'></div>
-    </div>
-</#macro>
-
