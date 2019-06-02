@@ -2,22 +2,23 @@ package com.github.robozonky.loanbook;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.function.Function;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.github.robozonky.loanbook.charts.Chart;
 import com.github.robozonky.loanbook.charts.ChartType;
 import com.github.robozonky.loanbook.charts.XYChart;
 import com.github.robozonky.loanbook.input.Data;
 import freemarker.template.Configuration;
+import io.vavr.Tuple2;
 
 final class Template implements Runnable {
 
-    private final List<Chart> charts = new ArrayList<>(0);
+    private final List<Chart> charts = new CopyOnWriteArrayList<>();
     private final Data data;
 
     public Template(final Data data) {
@@ -33,14 +34,14 @@ final class Template implements Runnable {
     }
 
     private String addDateToTitle(final String title) {
-        return title + " (Zonky loanbook " + data.getYearMonth() + ")";
+        return title + " (Zonky loanbook za " + data.getYearMonth() + ")";
     }
 
     void addPieChart(final String title, final String labelForX, final String labelForY,
-                     final Function<Data, SortedMap<? extends Comparable<?>, ? extends Number>> processor) {
+                     final BiConsumer<Data, Consumer<Tuple2<String, Number>>> processor) {
         final XYChart chart = new XYChart(ChartType.PIE, addDateToTitle(title), labelForX, labelForY);
-        processor.apply(data).forEach((key, value) -> chart.add(key.toString(), value));
         charts.add(chart);
+        processor.accept(data, tuple -> chart.add(tuple._1, tuple._2));
     }
 
     @Override
