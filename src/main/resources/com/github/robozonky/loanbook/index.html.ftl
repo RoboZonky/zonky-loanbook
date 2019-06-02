@@ -18,7 +18,13 @@
             <li>Zdrojová data jsou ke stažení na stránce <a href="https://zonky.cz/risk/">Jak se splácí půjčky na Zonky</a>.</li>
             <li>Provozovatelem této stránky je <a href="https://www.petrovicky.net/">Lukáš Petrovický</a>, autor <a href="https://www.robozonky.cz/">investičního robota RoboZonky</a>. Nejsem žádný velký grafik a hlavně mě uživatelské rozhraní nebaví. <strong>Chcete-li pomoci tuto stránku nastylovat, ozvěte se.</strong></li>
         </ul>
-        <h2>A teď už grafy</h2>
+        <h2>Dostupné grafy</h2>
+        <ul>
+        <#list data.charts as chart>
+            <li><a href="#<@htmlId chart />">${chart.getTitle()}</a></li>
+        </#list>
+        </ul>
+        <h2>A teď už vážně</h2>
         <#list data.charts as chart>
             <@chartMeta chart />
         </#list>
