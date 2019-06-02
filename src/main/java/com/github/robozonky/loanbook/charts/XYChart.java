@@ -1,5 +1,6 @@
 package com.github.robozonky.loanbook.charts;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class XYChart extends Chart {
 
 
     public XYChart(final ChartType type, final String title, final String labelForX, final String labelForY) {
-        super(type, title);
+        super(type, 2, title);
         this.labelForX = labelForX;
         this.labelForY = labelForY;
     }

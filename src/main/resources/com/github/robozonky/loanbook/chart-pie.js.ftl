@@ -9,7 +9,8 @@
             </#list>
         ]);
         var options = {
-            title: '${chart.getTitle()}'
+            title: '${chart.getTitle()}',
+            subtitle: '${chart.getSubtitle()}'
         };
         var chart_div = document.getElementById('<@htmlIdInteractive chart />');
         var chart = new google.visualization.PieChart(chart_div);
