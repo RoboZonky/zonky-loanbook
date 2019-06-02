@@ -2,18 +2,15 @@
 <#macro chartFunctionName chart>draw${chart.getType()}${chart.getAxisCount()}Chart${chart.getId()}</#macro>
 <#macro htmlId chart>chart-${chart.getType()}-${chart.getId()}</#macro>
 <#macro htmlIdInteractive chart><@htmlId chart />-interactive</#macro>
+<#macro htmlIdPng chart><@htmlId chart />-png</#macro>
 
 <#-- Support for individual charts. -->
-<#include "chart-pie.js.ftl">
 <#include "chart-bar3.js.ftl">
 
 <#-- Rendering of the individual charts from a shared macro. -->
 <#macro chartFunction chart>
     <#assign type>${chart.getType().toString()}</#assign>
     <#switch type>
-      <#case "PIE">
-        <@pieChart chart />
-        <#break>
       <#case "COLUMN">
       <#case "BAR">
         <@barChart3 chart />
@@ -25,53 +22,23 @@
 <#macro chartMeta chart>
     <div id="<@htmlId chart />">
         <div id="<@htmlIdInteractive chart />" style="width: 800px; height: 600px;"></div>
+        <div id='<@htmlIdPng chart />'>
+            <input type='button' value='Stáhnout jako PNG' onclick="generate('<@htmlId chart />.png', document.getElementById('<@htmlIdInteractive chart />').getElementsByTagName('svg')[0]);" />
+        </div>
     </div>
+    <hr />
 </#macro>
 
 <#-- And this, finally, is the HTML source. -->
 <html>
     <head>
         <title>Vizualizace Zonky loanbooku</title>
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script>
-            function getImgData(chartContainer) {
-                var chartArea = chartContainer.getElementsByTagName('iframe')[0]
-                                    .contentDocument.getElementById('chartArea');
-                var svg = chartArea.innerHTML;
-                var doc = chartContainer.ownerDocument;
-                var canvas = doc.createElement('canvas');
-                canvas.setAttribute('width', chartArea.offsetWidth);
-                canvas.setAttribute('height', chartArea.offsetHeight);
-                canvas.setAttribute('style',
-                    'position: absolute; ' +
-                    'top: ' + (-chartArea.offsetHeight * 2) + 'px;' +
-                    'left: ' + (-chartArea.offsetWidth * 2) + 'px;');
-                doc.body.appendChild(canvas);
-                canvg(canvas, svg);
-                var imgData = canvas.toDataURL("image/png");
-                canvas.parentNode.removeChild(canvas);
-                return imgData;
-            }
-
-            function saveAsImg(chartContainer) {
-                var imgData = getImgData(chartContainer);
-
-                // Replacing the mime-type will force the browser to trigger a download
-                // rather than displaying the image in the browser window.
-                window.location = imgData.replace("image/png", "image/octet-stream");
-            }
-
-            function toImg(chartContainer, imgContainer) {
-                var doc = chartContainer.ownerDocument;
-                var img = doc.createElement('img');
-                img.src = getImgData(chartContainer);
-
-                while (imgContainer.firstChild) {
-                  imgContainer.removeChild(imgContainer.firstChild);
-                }
-                imgContainer.appendChild(img);
-            }
-        </script>
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <!-- Store this locally as the updated versions available online throw all kinds of errors. -->
+        <script src="rgbcolor.js"></script>
+        <script src="canvg.js"></script>
+        <!-- And here starts our own code. -->
+        <script src="svgprint.js"></script>
         <script type="text/javascript">
           google.charts.load('current', {'packages':['bar', 'corechart']});
           <#list data.charts as chart>
@@ -91,7 +58,6 @@
         <h2>A teď už grafy</h2>
         <#list data.charts as chart>
             <@chartMeta chart />
-            <hr />
         </#list>
     </body>
 </html>

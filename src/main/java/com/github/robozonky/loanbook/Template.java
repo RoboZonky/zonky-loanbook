@@ -13,11 +13,9 @@ import java.util.function.Consumer;
 
 import com.github.robozonky.loanbook.charts.Chart;
 import com.github.robozonky.loanbook.charts.ChartType;
-import com.github.robozonky.loanbook.charts.XYChart;
 import com.github.robozonky.loanbook.charts.XYZChart;
 import com.github.robozonky.loanbook.input.Data;
 import freemarker.template.Configuration;
-import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 
 final class Template implements Runnable {
@@ -41,13 +39,6 @@ final class Template implements Runnable {
         return title + " (Zonky do " + data.getYearMonth() + " vč.)";
     }
 
-    void addPieChart(final String title, final String labelForX, final String labelForY,
-                     final BiConsumer<Data, Consumer<Tuple2<String, Number>>> processor) {
-        final XYChart chart = new XYChart(ChartType.PIE, addDateToTitle(title), labelForX, labelForY);
-        charts.add(chart);
-        processor.accept(data, tuple -> chart.add(tuple._1, tuple._2));
-    }
-
     void addBarChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
                      final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
         final XYZChart chart = new XYZChart(ChartType.BAR, addDateToTitle(title), labelForX, labelForY, labelForZ);
@@ -61,8 +52,6 @@ final class Template implements Runnable {
         charts.add(chart);
         processor.accept(data, tuple -> chart.add(tuple._1, tuple._2, tuple._3));
     }
-
-
 
     @Override
     public void run() {

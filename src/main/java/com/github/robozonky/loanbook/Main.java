@@ -1,14 +1,15 @@
 package com.github.robozonky.loanbook;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -22,13 +23,17 @@ import com.github.robozonky.loanbook.input.DataRow;
 import com.github.robozonky.loanbook.input.Ratio;
 import io.vavr.Tuple;
 import io.vavr.Tuple3;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Main {
 
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
+
     private static void abstractRiskChartCustomSorted(final Data data,
-                                                      final Function<DataRow, Main.CustomSortString> parameter,
+                                                      final Function<DataRow, CustomSortString> parameter,
                                                       final Consumer<Tuple3<String, String, Number>> adder) {
-        final TreeMap<Ratio, TreeMap<Main.CustomSortString, List<DataRow>>> byInterestRateAndSecond =
+        final TreeMap<Ratio, TreeMap<CustomSortString, List<DataRow>>> byInterestRateAndSecond =
                 data.getAll().collect(
                         Collectors.collectingAndThen(
                                 Collectors.groupingBy(DataRow::getInterestRate,
@@ -38,8 +43,8 @@ public class Main {
                                 TreeMap::new
                         ));
         // count totals
-        final Map<Ratio, Map<Main.CustomSortString, LongAdder>> totals = new HashMap<>(0);
-        final Map<Ratio, Map<Main.CustomSortString, LongAdder>> defaultedTotals = new HashMap<>(0);
+        final Map<Ratio, Map<CustomSortString, LongAdder>> totals = new HashMap<>(0);
+        final Map<Ratio, Map<CustomSortString, LongAdder>> defaultedTotals = new HashMap<>(0);
         byInterestRateAndSecond.forEach((ratio, sub) -> sub.forEach((second, rows) -> {
             totals.computeIfAbsent(ratio, __ -> new HashMap<>())
                     .computeIfAbsent(second, __ -> new LongAdder())
@@ -85,7 +90,7 @@ public class Main {
 
     private static void abstractRiskChart(final Data data, final Function<DataRow, String> parameter,
                                           final Consumer<Tuple3<String, String, Number>> adder) {
-        final Function<DataRow, Main.CustomSortString> convertor = r -> new Main.CustomSortString(parameter.apply(r));
+        final Function<DataRow, CustomSortString> convertor = r -> new CustomSortString(parameter.apply(r));
         abstractRiskChartCustomSorted(data, convertor, adder);
     }
 
@@ -108,11 +113,11 @@ public class Main {
             final int start = (cycle * step) / 1000;
             final int end = ((cycle + 1) * step) / 1000;
             if (cycle == 0) {
-                return new Main.CustomSortString(" do " + end, cycle);
+                return new CustomSortString(" do " + end, cycle);
             } else if (cycle > 13) {
-                return new Main.CustomSortString(" od " + start, cycle);
+                return new CustomSortString(" od " + start, cycle);
             } else {
-                return new Main.CustomSortString("od " + start + " do " + end, cycle);
+                return new CustomSortString("od " + start + " do " + end, cycle);
             }
         }, adder);
     }
@@ -124,13 +129,23 @@ public class Main {
             final int start = (cycle * step);
             final int end = ((cycle + 1) * step);
             if (cycle == 0) {
-                return new Main.CustomSortString(" do " + end, cycle);
+                return new CustomSortString(" do " + end, cycle);
             } else if (cycle > 5) {
-                return new Main.CustomSortString(" od " + start, cycle);
+                return new CustomSortString(" od " + start, cycle);
             } else {
-                return new Main.CustomSortString("od " + start + " do " + end, cycle);
+                return new CustomSortString("od " + start + " do " + end, cycle);
             }
         }, adder);
+    }
+
+    private static void saveJs(final String filename) {
+        try (final InputStream s = Main.class.getResourceAsStream(filename)) {
+            final byte[] bytes = s.readAllBytes();
+            Files.write(Path.of(filename),  bytes);
+            LOGGER.info("Saved {}.", filename);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static void main(final String... args) {
@@ -150,49 +165,8 @@ public class Main {
         template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::termRiskChart);
         template.run();
-    }
-
-    private static final class CustomSortString implements Comparable<Main.CustomSortString> {
-
-        private static final Comparator<Main.CustomSortString> COMPARATOR =
-                Comparator.<Main.CustomSortString>comparingInt(c -> c.sortId).thenComparing(c -> c.parent);
-        final int sortId;
-        final String parent;
-
-        public CustomSortString(final String parent) {
-            this(parent, 0);
-        }
-
-        public CustomSortString(final String parent, final int sortId) {
-            this.sortId = sortId;
-            this.parent = parent;
-        }
-
-        @Override
-        public int compareTo(final Main.CustomSortString customSortString) {
-            return COMPARATOR.compare(this, customSortString);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || !Objects.equals(getClass(), o.getClass())) {
-                return false;
-            }
-            final Main.CustomSortString that = (Main.CustomSortString) o;
-            return Objects.equals(parent, that.parent);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(parent);
-        }
-
-        @Override
-        public String toString() {
-            return parent;
-        }
+        saveJs("canvg.js");
+        saveJs("rgbcolor.js");
+        saveJs("svgprint.js");
     }
 }
