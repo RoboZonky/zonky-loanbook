@@ -39,6 +39,13 @@ final class Template implements Runnable {
         return title + " (Zonky do " + data.getYearMonth() + " vč.)";
     }
 
+    void addLineChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
+                     final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
+        final XYZChart chart = new XYZChart(ChartType.LINE, addDateToTitle(title), labelForX, labelForY, labelForZ);
+        charts.add(chart);
+        processor.accept(data, tuple -> chart.add(tuple._1, tuple._2, tuple._3));
+    }
+
     void addBarChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
                      final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
         final XYZChart chart = new XYZChart(ChartType.BAR, addDateToTitle(title), labelForX, labelForY, labelForZ);

@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.github.robozonky.loanbook.input.Data;
@@ -29,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    private static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
 
     private static void abstractRiskChartCustomSorted(final Data data,
                                                       final Function<DataRow, CustomSortString> parameter,
@@ -57,7 +60,7 @@ public class Main {
         // sum total defaults per the second parameter
         final Map<CustomSortString, LongAdder> defaultedPerSecondParameter = new HashMap<>(0);
         defaultedTotals.forEach((__, sub) -> sub.forEach((second, result) -> {
-           defaultedPerSecondParameter.computeIfAbsent(second, ___ -> new LongAdder()).add(result.longValue());
+            defaultedPerSecondParameter.computeIfAbsent(second, ___ -> new LongAdder()).add(result.longValue());
         }));
         final Map<CustomSortString, LongAdder> totalPerSecondParameter = new HashMap<>(0);
         totals.forEach((__, sub) -> sub.forEach((second, result) -> {
@@ -70,7 +73,8 @@ public class Main {
         // figure out the ratio and store into the chart
         byInterestRateAndSecond.forEach((ratio, sub) -> everySecond.forEach(second -> {
             final long totalCount = totalPerSecondParameter.getOrDefault(second, new LongAdder()).longValue();
-            final String id = second + " (" + defaultedPerSecondParameter.get(second) + " z " + totalPerSecondParameter.get(second) + ")";
+            final String id = second + " (" + defaultedPerSecondParameter.get(
+                    second) + " z " + totalPerSecondParameter.get(second) + ")";
             if (totalCount == 0) {
                 adder.accept(Tuple.of(id, ratio + " p.a.", BigDecimal.ZERO));
             } else {
@@ -81,8 +85,7 @@ public class Main {
                         BigDecimal.ZERO :
                         BigDecimal.valueOf(defaultedCount)
                                 .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
-                                .multiply(BigDecimal.TEN)
-                                .multiply(BigDecimal.TEN);
+                                .multiply(HUNDRED);
                 adder.accept(Tuple.of(id, ratio + " p.a.", result));
             }
         }));
@@ -141,11 +144,82 @@ public class Main {
     private static void saveJs(final String filename) {
         try (final InputStream s = Main.class.getResourceAsStream(filename)) {
             final byte[] bytes = s.readAllBytes();
-            Files.write(Path.of(filename),  bytes);
+            Files.write(Path.of(filename), bytes);
             LOGGER.info("Saved {}.", filename);
         } catch (final IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private static void interestRateDefaultTimeline(final Data data,
+                                                    final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractInterestRateHealthTimeline(data, DataRow::isDefaulted, adder);
+    }
+
+    private static void abstractInterestRateHealthTimeline(final Data data, final Predicate<DataRow> howHealthy,
+                                                           final Consumer<Tuple3<String, String, Number>> adder) {
+        final TreeMap<YearMonth, TreeMap<Ratio, List<DataRow>>> byMonthAndRating =
+                data.getAll().collect(
+                        Collectors.collectingAndThen(
+                                Collectors.groupingBy(r -> YearMonth.from(r.getOrigin()),
+                                                      Collectors.collectingAndThen(
+                                                              Collectors.groupingBy(DataRow::getInterestRate,
+                                                                                    Collectors.toList()),
+                                                              TreeMap::new)),
+                                TreeMap::new
+                        ));
+        // count totals
+        final Map<YearMonth, Map<Ratio, LongAdder>> totals = new HashMap<>(0);
+        final Map<YearMonth, Map<Ratio, LongAdder>> healthyTotals = new HashMap<>(0);
+        byMonthAndRating.forEach((ratio, sub) -> sub.forEach((second, rows) -> {
+            totals.computeIfAbsent(ratio, __ -> new HashMap<>())
+                    .computeIfAbsent(second, __ -> new LongAdder())
+                    .add(rows.size());
+            final long healthy = rows.stream().filter(howHealthy).count();
+            healthyTotals.computeIfAbsent(ratio, __ -> new HashMap<>())
+                    .computeIfAbsent(second, __ -> new LongAdder())
+                    .add(healthy);
+        }));
+        // sum total defaults per the second parameter
+        final Map<Ratio, LongAdder> healthyPerSecondParameter = new HashMap<>(0);
+        healthyTotals.forEach((__, sub) -> sub.forEach((second, result) -> {
+            healthyPerSecondParameter.computeIfAbsent(second, ___ -> new LongAdder()).add(result.longValue());
+        }));
+        final Map<Ratio, LongAdder> totalPerSecondParameter = new HashMap<>(0);
+        totals.forEach((__, sub) -> sub.forEach((second, result) -> {
+            totalPerSecondParameter.computeIfAbsent(second, ___ -> new LongAdder()).add(result.longValue());
+        }));
+        // figure out every possible category, in expected order
+        final SortedSet<Ratio> everySecond = totals.entrySet().stream()
+                .flatMap(entry -> entry.getValue().keySet().stream())
+                .collect(Collectors.toCollection(TreeSet::new));
+        // figure out the ratio and store into the chart
+        byMonthAndRating.forEach((yearMonth, sub) -> everySecond.forEach(second -> {
+            final long totalCount = sub.getOrDefault(second, Collections.emptyList()).size();
+            if (totalCount == 0) {
+                adder.accept(Tuple.of(yearMonth.toString(), second + " p.a.", BigDecimal.ZERO));
+            } else {
+                final long healthyCount = healthyTotals.getOrDefault(yearMonth, Collections.emptyMap())
+                        .getOrDefault(second, new LongAdder())
+                        .longValue();
+                final BigDecimal result = healthyCount == 0 ?
+                        BigDecimal.ZERO :
+                        BigDecimal.valueOf(healthyCount)
+                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
+                                .multiply(HUNDRED);
+                adder.accept(Tuple.of(yearMonth.toString(), second + " p.a.", result));
+            }
+        }));
+    }
+
+    private static void interestRateHealthTimeline(final Data data,
+                                                   final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractInterestRateHealthTimeline(data, r -> r.getMaxDaysPastDue() < 1, adder);
+    }
+
+    private static void interestRate30DayTimeline(final Data data,
+                                                   final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractInterestRateHealthTimeline(data, r -> r.getMaxDaysPastDue() > 0 && r.getMaxDaysPastDue() < 31, adder);
     }
 
     public static void main(final String... args) {
@@ -164,6 +238,15 @@ public class Main {
                              "Zesplatněno z celku [%]", Main::principalRiskChart);
         template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::termRiskChart);
+        template.addLineChart("Půjčky bez prodlení podle data originace a ratingu [%]", "Datum originace",
+                              "Úroková míra [% p.a.]", "Nikdy v prodlení z originovaných [%]",
+                              Main::interestRateHealthTimeline);
+        template.addLineChart("Půjčky s max. 30 dny prodlení podle data originace a ratingu [%]", "Datum originace",
+                              "Úroková míra [% p.a.]", "Nejvýše 30 dní v prodlení z originovaných [%]",
+                              Main::interestRate30DayTimeline);
+        template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
+                              "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
+                              Main::interestRateDefaultTimeline);
         template.run();
         saveJs("canvg.js");
         saveJs("rgbcolor.js");
