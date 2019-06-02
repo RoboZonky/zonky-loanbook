@@ -47,22 +47,27 @@ final class Template implements Runnable {
     }
 
     void addColumnChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
-                     final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
+                        final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
         final XYZChart chart = new XYZChart(ChartType.COLUMN, addDateToTitle(title), labelForX, labelForY, labelForZ);
         charts.add(chart);
         processor.accept(data, tuple -> chart.add(tuple._1, tuple._2, tuple._3));
     }
 
-    @Override
-    public void run() {
-        try (final var writer = Files.newBufferedWriter(Path.of("index.html"))) {
+    private void process(final String filename) {
+        try (final var writer = Files.newBufferedWriter(Path.of(filename))) {
             final Map<String, Object> data = new LinkedHashMap<>();
             data.put("data", Map.of("charts", charts, "now", Date.from(Instant.now())));
             getFreemarkerConfiguration(Main.class)
-                    .getTemplate("index.html.ftl")
+                    .getTemplate(filename + ".ftl")
                     .process(data, writer);
         } catch (final Exception ex) {
-            throw new IllegalStateException(ex);
+            throw new IllegalStateException("Failed processing " + filename, ex);
         }
+    }
+
+    @Override
+    public void run() {
+        process("index.html");
+        process("charts.js");
     }
 }
