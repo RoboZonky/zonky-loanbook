@@ -50,17 +50,25 @@ public class Main {
                     .computeIfAbsent(second, __ -> new LongAdder())
                     .add(defaulted);
         }));
+        // sum total defaults per the second parameter
+        final Map<CustomSortString, LongAdder> defaultedPerSecondParameter = new HashMap<>(0);
+        defaultedTotals.forEach((__, sub) -> sub.forEach((second, result) -> {
+           defaultedPerSecondParameter.computeIfAbsent(second, ___ -> new LongAdder()).add(result.longValue());
+        }));
+        final Map<CustomSortString, LongAdder> totalPerSecondParameter = new HashMap<>(0);
+        totals.forEach((__, sub) -> sub.forEach((second, result) -> {
+            totalPerSecondParameter.computeIfAbsent(second, ___ -> new LongAdder()).add(result.longValue());
+        }));
         // figure out every possible category, in expected order
         final SortedSet<CustomSortString> everySecond = totals.entrySet().stream()
                 .flatMap(entry -> entry.getValue().keySet().stream())
                 .collect(Collectors.toCollection(TreeSet::new));
         // figure out the ratio and store into the chart
         byInterestRateAndSecond.forEach((ratio, sub) -> everySecond.forEach(second -> {
-            final long totalCount = totals.getOrDefault(ratio, Collections.emptyMap())
-                    .getOrDefault(second, new LongAdder())
-                    .longValue();
+            final long totalCount = totalPerSecondParameter.getOrDefault(second, new LongAdder()).longValue();
+            final String id = second + " (" + defaultedPerSecondParameter.get(second) + " ks)";
             if (totalCount == 0) {
-                adder.accept(Tuple.of(second.toString(), ratio + " p.a.", BigDecimal.ZERO));
+                adder.accept(Tuple.of(id, ratio + " p.a.", BigDecimal.ZERO));
             } else {
                 final long defaultedCount = defaultedTotals.getOrDefault(ratio, Collections.emptyMap())
                         .getOrDefault(second, new LongAdder())
@@ -71,7 +79,7 @@ public class Main {
                                 .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
                                 .multiply(BigDecimal.TEN)
                                 .multiply(BigDecimal.TEN);
-                adder.accept(Tuple.of(second.toString(), ratio + " p.a.", result));
+                adder.accept(Tuple.of(id, ratio + " p.a.", result));
             }
         }));
     }
@@ -133,15 +141,15 @@ public class Main {
         final String[][] result = c.apply(s);
         final Template template = new Template(Data.process(result));
         template.addBarChart("Zesplatněné půjčky podle kraje", "Kraj", "Úroková míra [% p.a.]",
-                             "Zesplatněno z počtu [%]", Main::regionRiskChart);
+                             "Zesplatněno z celku [%]", Main::regionRiskChart);
         template.addBarChart("Zesplatněné půjčky podle zdroje příjmu žadatele", "Zdroj příjmu", "Úroková míra [% p.a.]",
-                             "Zesplatněno z počtu [%]", Main::incomeRiskChart);
+                             "Zesplatněno z celku [%]", Main::incomeRiskChart);
         template.addBarChart("Zesplatněné půjčky podle účelu", "Účel", "Úroková míra [% p.a.]",
-                             "Zesplatněno z počtu [%]", Main::purposeRiskChart);
+                             "Zesplatněno z celku [%]", Main::purposeRiskChart);
         template.addBarChart("Zesplatněné půjčky podle výše úvěru", "Výše úvěru [tis. Kč]", "Úroková míra [% p.a.]",
-                             "Zesplatněno z počtu [%]", Main::principalRiskChart);
+                             "Zesplatněno z celku [%]", Main::principalRiskChart);
         template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",
-                             "Zesplatněno z počtu [%]", Main::termRiskChart);
+                             "Zesplatněno z celku [%]", Main::termRiskChart);
         template.run();
     }
 

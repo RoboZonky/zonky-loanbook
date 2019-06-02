@@ -68,6 +68,7 @@ public final class Data {
                         return null;
                     }
                 }).forEach(data::addRow);
+        LOGGER.info("Loaded {} data rows.", data.getAll().count());
         return data;
     }
 
