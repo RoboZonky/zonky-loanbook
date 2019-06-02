@@ -44,7 +44,6 @@ public class Main {
             totals.computeIfAbsent(ratio, __ -> new HashMap<>())
                     .computeIfAbsent(second, __ -> new LongAdder())
                     .add(rows.size());
-            totals.getOrDefault(ratio, new HashMap<>()).getOrDefault(second, new LongAdder()).add(rows.size());
             final long defaulted = rows.stream().filter(DataRow::isDefaulted).count();
             defaultedTotals.computeIfAbsent(ratio, __ -> new HashMap<>())
                     .computeIfAbsent(second, __ -> new LongAdder())
@@ -66,7 +65,7 @@ public class Main {
         // figure out the ratio and store into the chart
         byInterestRateAndSecond.forEach((ratio, sub) -> everySecond.forEach(second -> {
             final long totalCount = totalPerSecondParameter.getOrDefault(second, new LongAdder()).longValue();
-            final String id = second + " (" + defaultedPerSecondParameter.get(second) + " ks)";
+            final String id = second + " (" + defaultedPerSecondParameter.get(second) + " z " + totalPerSecondParameter.get(second) + ")";
             if (totalCount == 0) {
                 adder.accept(Tuple.of(id, ratio + " p.a.", BigDecimal.ZERO));
             } else {
@@ -140,12 +139,12 @@ public class Main {
         final XLSXConverter c = new XLSXConverter();
         final String[][] result = c.apply(s);
         final Template template = new Template(Data.process(result));
+        template.addBarChart("Zesplatněné půjčky podle účelu", "Účel", "Úroková míra [% p.a.]",
+                             "Zesplatněno z celku [%]", Main::purposeRiskChart);
         template.addBarChart("Zesplatněné půjčky podle kraje", "Kraj", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::regionRiskChart);
         template.addBarChart("Zesplatněné půjčky podle zdroje příjmu žadatele", "Zdroj příjmu", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::incomeRiskChart);
-        template.addBarChart("Zesplatněné půjčky podle účelu", "Účel", "Úroková míra [% p.a.]",
-                             "Zesplatněno z celku [%]", Main::purposeRiskChart);
         template.addBarChart("Zesplatněné půjčky podle výše úvěru", "Výše úvěru [tis. Kč]", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::principalRiskChart);
         template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",

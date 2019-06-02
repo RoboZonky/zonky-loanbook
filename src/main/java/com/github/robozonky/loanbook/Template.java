@@ -2,6 +2,8 @@ package com.github.robozonky.loanbook;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,7 @@ final class Template implements Runnable {
     public void run() {
         try (final var writer = Files.newBufferedWriter(Path.of("index.html"))) {
             final Map<String, Object> data = new LinkedHashMap<>();
-            data.put("data", Map.of("charts", charts));
+            data.put("data", Map.of("charts", charts, "now", Date.from(Instant.now())));
             getFreemarkerConfiguration(Main.class)
                     .getTemplate("index.html.ftl")
                     .process(data, writer);
