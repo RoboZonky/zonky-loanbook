@@ -29,14 +29,15 @@ public class XYZChart extends Chart {
         return Arrays.stream(label).anyMatch(s -> s.contains("% p.a."));
     }
 
-    public XYZChart(final ChartType type, final String title, final String labelForX, final String labelForY,
-                    final String labelForZ) {
-        this(type, title, labelForX, labelForY, labelForZ, hasInterestRate(labelForX, labelForY, labelForZ));
+    public XYZChart(final ChartType type, final String title, final String subtitle, final String labelForX,
+                    final String labelForY, final String labelForZ) {
+        this(type, title, subtitle, labelForX, labelForY, labelForZ, hasInterestRate(labelForX, labelForY, labelForZ));
     }
 
-    public XYZChart(final ChartType type, final String title, final String labelForX, final String labelForY,
+    public XYZChart(final ChartType type, final String title, final String subtitle, final String labelForX,
+                    final String labelForY,
                     final String labelForZ, final boolean ratingsAsSeries) {
-        super(type, 3, title);
+        super(type, 3, title, subtitle);
         this.labelForX = labelForX;
         this.labelForY = labelForY;
         this.labelForZ = labelForZ;

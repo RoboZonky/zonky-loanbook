@@ -1,6 +1,5 @@
 package com.github.robozonky.loanbook.charts;
 
-import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Chart {
@@ -13,12 +12,12 @@ public abstract class Chart {
     private final String title;
     private final String subtitle;
 
-    protected Chart(final ChartType type, final int axisCount, final String title) {
+    protected Chart(final ChartType type, final int axisCount, final String title, final String subtitle) {
         this.id = ID_GENERATOR.getAndIncrement();
         this.axisCount = axisCount;
         this.type = type;
         this.title = title;
-        this.subtitle = "Autor: Lukáš Petrovický, " + LocalDate.now();
+        this.subtitle = subtitle;
     }
 
     public int getId() {

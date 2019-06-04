@@ -3,6 +3,8 @@ package com.github.robozonky.loanbook;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,9 +24,16 @@ final class Template implements Runnable {
 
     private final List<Chart> charts = new CopyOnWriteArrayList<>();
     private final Data data;
+    private final String subtitle;
 
     public Template(final Data data) {
         this.data = data;
+        LocalDate localDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. M. yyyy");
+        String formattedDate = localDate.format(formatter);
+        final String second = data.getYearMonth().getMonthValue() + "/" + data.getYearMonth().getYear();
+        this.subtitle = "Vygeneroval Lukáš Petrovický dne " + formattedDate +
+                " ze Zonky loanbooku ke konci " + second + '.';
     }
 
     private static Configuration getFreemarkerConfiguration(final Class<?> templateRoot) {
@@ -35,27 +44,23 @@ final class Template implements Runnable {
         return cfg;
     }
 
-    private String addDateToTitle(final String title) {
-        return title + " (Zonky do " + data.getYearMonth() + " vč.)";
-    }
-
     void addLineChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
-                     final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
-        final XYZChart chart = new XYZChart(ChartType.LINE, addDateToTitle(title), labelForX, labelForY, labelForZ);
+                      final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
+        final XYZChart chart = new XYZChart(ChartType.LINE, title, subtitle, labelForX, labelForY, labelForZ);
         charts.add(chart);
         processor.accept(data, tuple -> chart.add(tuple._1, tuple._2, tuple._3));
     }
 
     void addBarChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
                      final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
-        final XYZChart chart = new XYZChart(ChartType.BAR, addDateToTitle(title), labelForX, labelForY, labelForZ);
+        final XYZChart chart = new XYZChart(ChartType.BAR, title, subtitle, labelForX, labelForY, labelForZ);
         charts.add(chart);
         processor.accept(data, tuple -> chart.add(tuple._1, tuple._2, tuple._3));
     }
 
     void addColumnChart(final String title, final String labelForX, final String labelForY, final String labelForZ,
                         final BiConsumer<Data, Consumer<Tuple3<String, String, Number>>> processor) {
-        final XYZChart chart = new XYZChart(ChartType.COLUMN, addDateToTitle(title), labelForX, labelForY, labelForZ);
+        final XYZChart chart = new XYZChart(ChartType.COLUMN, title, subtitle, labelForX, labelForY, labelForZ);
         charts.add(chart);
         processor.accept(data, tuple -> chart.add(tuple._1, tuple._2, tuple._3));
     }
