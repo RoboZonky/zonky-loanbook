@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import com.github.robozonky.loanbook.input.Data;
 import com.github.robozonky.loanbook.input.DataRow;
@@ -257,22 +258,23 @@ public class Main {
         });
     }
 
-    private static void abstractInterestRateHealthBinary(final Data data, final Predicate<DataRow> firstFilter,
+    private static void abstractInterestRateHealthBinary(final Stream<DataRow> data,
+                                                         final Predicate<DataRow> firstFilter,
                                                          final Predicate<DataRow> sorter,
                                                          final Consumer<Tuple3<String, String, Number>> adder) {
+        final List<DataRow> allData = data.collect(toList());
         final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondTotal =
-                data.getAll()
-                        .collect(
-                                collectingAndThen(
-                                        groupingBy(DataRow::getInterestRate,
-                                                   collectingAndThen(
-                                                           groupingBy(sorter::test,
-                                                                      toList()),
-                                                           TreeMap::new)),
-                                        TreeMap::new
-                                ));
+                allData.stream().collect(
+                        collectingAndThen(
+                                groupingBy(DataRow::getInterestRate,
+                                           collectingAndThen(
+                                                   groupingBy(sorter::test,
+                                                              toList()),
+                                                   TreeMap::new)),
+                                TreeMap::new
+                        ));
         final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondFiltered =
-                data.getAll()
+                allData.stream()
                         .filter(firstFilter)
                         .collect(
                                 collectingAndThen(
@@ -312,12 +314,15 @@ public class Main {
 
     private static void interestRateInsuranceRiskChart(final Data data,
                                                        final Consumer<Tuple3<String, String, Number>> adder) {
-        abstractInterestRateHealthBinary(data, DataRow::isDefaulted, DataRow::isInsured, adder);
+        final YearMonth insuranceStart = YearMonth.of(2018, 4);
+        final Stream<DataRow> filtered = data.getAll()
+                .filter(r -> YearMonth.from(r.getOrigin()).isAfter(insuranceStart));
+        abstractInterestRateHealthBinary(filtered, DataRow::isDefaulted, DataRow::isInsured, adder);
     }
 
     private static void interestRateStoryRiskChart(final Data data,
                                                    final Consumer<Tuple3<String, String, Number>> adder) {
-        abstractInterestRateHealthBinary(data, DataRow::isDefaulted, DataRow::isStory, adder);
+        abstractInterestRateHealthBinary(data.getAll(), DataRow::isDefaulted, DataRow::isStory, adder);
     }
 
     private static void storyAndInsuranceTimelineChart(final Data data,
@@ -345,8 +350,9 @@ public class Main {
                              "Zesplatněno z celku [%]", Main::termRiskChart);
         template.addColumnChart("Zesplatněné půjčky podle příběhu", "Má příběh?", "Úroková míra [% p.a.]",
                                 "Zesplatněno z celku [%]", Main::interestRateStoryRiskChart);
-        template.addColumnChart("Zesplatněné půjčky podle pojištění", "Má pojištění?", "Úroková míra [% p.a.]",
-                                "Zesplatněno z celku [%]", Main::interestRateInsuranceRiskChart);
+        template.addColumnChart("Zesplatněné půjčky podle pojištění, od jeho zavedení", "Má pojištění?",
+                                "Úroková míra [% p.a.]", "Zesplatněno z celku [%]",
+                                Main::interestRateInsuranceRiskChart);
         template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
                               "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
                               Main::interestRateDefaultTimeline);
