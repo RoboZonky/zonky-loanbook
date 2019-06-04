@@ -218,8 +218,71 @@ public class Main {
     }
 
     private static void interestRate30DayTimeline(final Data data,
-                                                   final Consumer<Tuple3<String, String, Number>> adder) {
+                                                  final Consumer<Tuple3<String, String, Number>> adder) {
         abstractInterestRateHealthTimeline(data, r -> r.getMaxDaysPastDue() > 0 && r.getMaxDaysPastDue() < 31, adder);
+    }
+
+    private static void abstractInterestRateHealthBinary(final Data data, final Predicate<DataRow> firstFilter,
+                                                         final Predicate<DataRow> sorter,
+                                                         final Consumer<Tuple3<String, String, Number>> adder) {
+        final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondTotal =
+                data.getAll()
+                        .collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.groupingBy(DataRow::getInterestRate,
+                                                              Collectors.collectingAndThen(
+                                                                      Collectors.groupingBy(sorter::test,
+                                                                                            Collectors.toList()),
+                                                                      TreeMap::new)),
+                                        TreeMap::new
+                                ));
+        final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondFiltered =
+                data.getAll()
+                        .filter(firstFilter)
+                        .collect(
+                                Collectors.collectingAndThen(
+                                        Collectors.groupingBy(DataRow::getInterestRate,
+                                                              Collectors.collectingAndThen(
+                                                                      Collectors.groupingBy(sorter::test,
+                                                                                            Collectors.toList()),
+                                                                      TreeMap::new)),
+                                        TreeMap::new
+                                ));
+        // figure out every possible category, in expected order
+        final SortedSet<Ratio> everySecond = new TreeSet<>(byInterestRateAndSecondTotal.keySet());
+        everySecond.forEach(interestRate -> {
+            final String id = interestRate + " p.a.";
+            for (int i = 0; i <= 1; i++) {
+                final boolean matches = i == 1;
+                final int count = byInterestRateAndSecondFiltered.getOrDefault(interestRate, new TreeMap<>())
+                        .getOrDefault(matches, Collections.emptyList())
+                        .size();
+                final long totalCount = byInterestRateAndSecondTotal.values().stream()
+                        .mapToLong(map -> map.getOrDefault(matches, Collections.emptyList()).size())
+                        .sum();
+                final long totalFilteredCount = byInterestRateAndSecondFiltered.values().stream()
+                        .mapToLong(map -> map.getOrDefault(matches, Collections.emptyList()).size())
+                        .sum();
+                final String partValue = matches ? "Má" : "Nemá";
+                final String value = partValue + " (" + totalFilteredCount + " z " + totalCount + ")";
+                final BigDecimal result = count == 0 ?
+                        BigDecimal.ZERO :
+                        BigDecimal.valueOf(count)
+                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
+                                .multiply(HUNDRED);
+                adder.accept(Tuple.of(value, id, result));
+            }
+        });
+    }
+
+    private static void interestRateInsuranceRiskChart(final Data data,
+                                                       final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractInterestRateHealthBinary(data, DataRow::isDefaulted, DataRow::isInsured, adder);
+    }
+
+    private static void interestRateStoryRiskChart(final Data data,
+                                                   final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractInterestRateHealthBinary(data, DataRow::isDefaulted, DataRow::isStory, adder);
     }
 
     public static void main(final String... args) {
@@ -238,6 +301,10 @@ public class Main {
                              "Zesplatněno z celku [%]", Main::principalRiskChart);
         template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::termRiskChart);
+        template.addColumnChart("Zesplatněné půjčky podle příběhu", "Má příběh?", "Úroková míra [% p.a.]",
+                                "Zesplatněno z celku [%]", Main::interestRateStoryRiskChart);
+        template.addColumnChart("Zesplatněné půjčky podle pojištění", "Má pojištění?", "Úroková míra [% p.a.]",
+                                "Zesplatněno z celku [%]", Main::interestRateInsuranceRiskChart);
         template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
                               "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
                               Main::interestRateDefaultTimeline);

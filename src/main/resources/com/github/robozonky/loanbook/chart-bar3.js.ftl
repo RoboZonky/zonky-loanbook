@@ -19,7 +19,7 @@
             },
             <#if chart.getType().toString() == "BAR">bars: 'horizontal',</#if>
             axes: {
-                x: {
+                <#if chart.getType().toString() == "BAR">x<#else>y</#if>: {
                   0: {label: '${chart.getLabelForZ()}'}
                 },
             },
