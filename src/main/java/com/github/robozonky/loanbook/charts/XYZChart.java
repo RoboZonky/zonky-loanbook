@@ -2,6 +2,7 @@ package com.github.robozonky.loanbook.charts;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,14 +23,28 @@ public class XYZChart extends Chart {
     private final Set<String> adaptedAxisLabels = new LinkedHashSet<>();
     private final Map<String, Map<String, Number>> adaptedData = new LinkedHashMap<>();
     private final List<Tuple3<String, String, Number>> data = new ArrayList<>(0);
+    private final boolean ratingsAsSeries;
 
+    private static boolean hasInterestRate(final String... label) {
+        return Arrays.stream(label).anyMatch(s -> s.contains("% p.a."));
+    }
 
     public XYZChart(final ChartType type, final String title, final String labelForX, final String labelForY,
                     final String labelForZ) {
+        this(type, title, labelForX, labelForY, labelForZ, hasInterestRate(labelForX, labelForY, labelForZ));
+    }
+
+    public XYZChart(final ChartType type, final String title, final String labelForX, final String labelForY,
+                    final String labelForZ, final boolean ratingsAsSeries) {
         super(type, 3, title);
         this.labelForX = labelForX;
         this.labelForY = labelForY;
         this.labelForZ = labelForZ;
+        this.ratingsAsSeries = ratingsAsSeries;
+    }
+
+    public boolean isRatingsAsSeries() {
+        return ratingsAsSeries;
     }
 
     public String getLabelForX() {

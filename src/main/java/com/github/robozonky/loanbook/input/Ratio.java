@@ -13,7 +13,7 @@ public final class Ratio extends Number implements Comparable<Ratio> {
     private static final DecimalFormat FORMAT = new DecimalFormat("##.## %", FORMAT_SYMBOLS);
     private final BigDecimal value;
 
-    Ratio(final BigDecimal bigDecimal) {
+    public Ratio(final BigDecimal bigDecimal) {
         this.value = bigDecimal;
     }
 

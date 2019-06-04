@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -18,15 +19,20 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import com.github.robozonky.loanbook.input.Data;
 import com.github.robozonky.loanbook.input.DataRow;
 import com.github.robozonky.loanbook.input.Ratio;
 import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
 public class Main {
 
@@ -38,11 +44,11 @@ public class Main {
                                                       final Consumer<Tuple3<String, String, Number>> adder) {
         final TreeMap<Ratio, TreeMap<CustomSortString, List<DataRow>>> byInterestRateAndSecond =
                 data.getAll().collect(
-                        Collectors.collectingAndThen(
-                                Collectors.groupingBy(DataRow::getInterestRate,
-                                                      Collectors.collectingAndThen(
-                                                              Collectors.groupingBy(parameter, Collectors.toList()),
-                                                              TreeMap::new)),
+                        collectingAndThen(
+                                groupingBy(DataRow::getInterestRate,
+                                           collectingAndThen(
+                                                   groupingBy(parameter, toList()),
+                                                   TreeMap::new)),
                                 TreeMap::new
                         ));
         // count totals
@@ -69,7 +75,7 @@ public class Main {
         // figure out every possible category, in expected order
         final SortedSet<CustomSortString> everySecond = totals.entrySet().stream()
                 .flatMap(entry -> entry.getValue().keySet().stream())
-                .collect(Collectors.toCollection(TreeSet::new));
+                .collect(toCollection(TreeSet::new));
         // figure out the ratio and store into the chart
         byInterestRateAndSecond.forEach((ratio, sub) -> everySecond.forEach(second -> {
             final long totalCount = totalPerSecondParameter.getOrDefault(second, new LongAdder()).longValue();
@@ -160,12 +166,12 @@ public class Main {
                                                            final Consumer<Tuple3<String, String, Number>> adder) {
         final TreeMap<YearMonth, TreeMap<Ratio, List<DataRow>>> byMonthAndRating =
                 data.getAll().collect(
-                        Collectors.collectingAndThen(
-                                Collectors.groupingBy(r -> YearMonth.from(r.getOrigin()),
-                                                      Collectors.collectingAndThen(
-                                                              Collectors.groupingBy(DataRow::getInterestRate,
-                                                                                    Collectors.toList()),
-                                                              TreeMap::new)),
+                        collectingAndThen(
+                                groupingBy(r -> YearMonth.from(r.getOrigin()),
+                                           collectingAndThen(
+                                                   groupingBy(DataRow::getInterestRate,
+                                                              toList()),
+                                                   TreeMap::new)),
                                 TreeMap::new
                         ));
         // count totals
@@ -192,7 +198,7 @@ public class Main {
         // figure out every possible category, in expected order
         final SortedSet<Ratio> everySecond = totals.entrySet().stream()
                 .flatMap(entry -> entry.getValue().keySet().stream())
-                .collect(Collectors.toCollection(TreeSet::new));
+                .collect(toCollection(TreeSet::new));
         // figure out the ratio and store into the chart
         byMonthAndRating.forEach((yearMonth, sub) -> everySecond.forEach(second -> {
             final long totalCount = sub.getOrDefault(second, Collections.emptyList()).size();
@@ -212,14 +218,43 @@ public class Main {
         }));
     }
 
-    private static void interestRateHealthTimeline(final Data data,
-                                                   final Consumer<Tuple3<String, String, Number>> adder) {
-        abstractInterestRateHealthTimeline(data, r -> r.getMaxDaysPastDue() < 1, adder);
+    private static Number insuredToTotalRatio(final List<DataRow> data) {
+        return somethingToTotalRatio(data, DataRow::isInsured);
     }
 
-    private static void interestRate30DayTimeline(final Data data,
-                                                  final Consumer<Tuple3<String, String, Number>> adder) {
-        abstractInterestRateHealthTimeline(data, r -> r.getMaxDaysPastDue() > 0 && r.getMaxDaysPastDue() < 31, adder);
+    private static Number storiedToTotalRatio(final List<DataRow> data) {
+        return somethingToTotalRatio(data, DataRow::isStory);
+    }
+
+    private static Number defaultedToTotalRatio(final List<DataRow> data) {
+        return somethingToTotalRatio(data, DataRow::isDefaulted);
+    }
+
+    private static Number somethingToTotalRatio(final List<DataRow> data, final Predicate<DataRow> include) {
+        final long stories = data.stream()
+                .filter(include)
+                .count();
+        final BigDecimal ratio = BigDecimal.valueOf(stories)
+                .divide(BigDecimal.valueOf(data.size()), 4, RoundingMode.HALF_EVEN);
+        return new Ratio(ratio);
+    }
+
+    private static void abstractTimeline(final Data data, final Consumer<Tuple3<String, String, Number>> adder,
+                                         final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+        final SortedMap<YearMonth, List<DataRow>> all =
+                data.getAll().collect(
+                        collectingAndThen(
+                                groupingBy(r -> YearMonth.from(r.getOrigin()),
+                                           toList()),
+                                TreeMap::new
+                        ));
+        all.forEach((yearMonth, rows) -> {
+            for (final Tuple2<String, Function<List<DataRow>, Number>> metric : metrics) {
+                final Number raw = metric._2.apply(rows);
+                final Number value = raw instanceof Ratio ? raw.doubleValue() * 100 : raw;
+                adder.accept(Tuple.of(yearMonth.toString(), metric._1, value));
+            }
+        });
     }
 
     private static void abstractInterestRateHealthBinary(final Data data, final Predicate<DataRow> firstFilter,
@@ -228,24 +263,24 @@ public class Main {
         final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondTotal =
                 data.getAll()
                         .collect(
-                                Collectors.collectingAndThen(
-                                        Collectors.groupingBy(DataRow::getInterestRate,
-                                                              Collectors.collectingAndThen(
-                                                                      Collectors.groupingBy(sorter::test,
-                                                                                            Collectors.toList()),
-                                                                      TreeMap::new)),
+                                collectingAndThen(
+                                        groupingBy(DataRow::getInterestRate,
+                                                   collectingAndThen(
+                                                           groupingBy(sorter::test,
+                                                                      toList()),
+                                                           TreeMap::new)),
                                         TreeMap::new
                                 ));
         final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondFiltered =
                 data.getAll()
                         .filter(firstFilter)
                         .collect(
-                                Collectors.collectingAndThen(
-                                        Collectors.groupingBy(DataRow::getInterestRate,
-                                                              Collectors.collectingAndThen(
-                                                                      Collectors.groupingBy(sorter::test,
-                                                                                            Collectors.toList()),
-                                                                      TreeMap::new)),
+                                collectingAndThen(
+                                        groupingBy(DataRow::getInterestRate,
+                                                   collectingAndThen(
+                                                           groupingBy(sorter::test,
+                                                                      toList()),
+                                                           TreeMap::new)),
                                         TreeMap::new
                                 ));
         // figure out every possible category, in expected order
@@ -285,6 +320,13 @@ public class Main {
         abstractInterestRateHealthBinary(data, DataRow::isDefaulted, DataRow::isStory, adder);
     }
 
+    private static void storyAndInsuranceTimelineChart(final Data data,
+                                                       final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractTimeline(data, adder, Tuple.of("Zesplatněno [%]", Main::defaultedToTotalRatio),
+                         Tuple.of("S pojištěním [%]", Main::insuredToTotalRatio),
+                         Tuple.of("S příběhem [%]", Main::storiedToTotalRatio));
+    }
+
     public static void main(final String... args) {
         final XLSXDownloader downloader = new XLSXDownloader();
         final InputStream s = downloader.get().orElseThrow(() -> new IllegalStateException("No loanbook available."));
@@ -308,16 +350,8 @@ public class Main {
         template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
                               "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
                               Main::interestRateDefaultTimeline);
-        // these don't seem tobe right, fix them first
-        /*
-        template.addLineChart("Půjčky bez prodlení podle data originace a ratingu [%]", "Datum originace",
-                              "Úroková míra [% p.a.]", "Nikdy v prodlení z originovaných [%]",
-                              Main::interestRateHealthTimeline);
-        template.addLineChart("Půjčky s max. 30 dny prodlení podle data originace a ratingu [%]", "Datum originace",
-                              "Úroková míra [% p.a.]", "Nejvýše 30 dní v prodlení z originovaných [%]",
-                              Main::interestRate30DayTimeline);
-
-         */
+        template.addLineChart("Zesplatnění, příběhy a pojištění podle data originace", "Datum originace",
+                              "", "", Main::storyAndInsuranceTimelineChart);
         template.run();
         saveJs("canvg.js");
         saveJs("rgbcolor.js");
