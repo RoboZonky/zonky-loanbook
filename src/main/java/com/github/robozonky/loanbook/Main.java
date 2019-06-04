@@ -238,15 +238,19 @@ public class Main {
                              "Zesplatněno z celku [%]", Main::principalRiskChart);
         template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",
                              "Zesplatněno z celku [%]", Main::termRiskChart);
+        template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
+                              "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
+                              Main::interestRateDefaultTimeline);
+        // these don't seem tobe right, fix them first
+        /*
         template.addLineChart("Půjčky bez prodlení podle data originace a ratingu [%]", "Datum originace",
                               "Úroková míra [% p.a.]", "Nikdy v prodlení z originovaných [%]",
                               Main::interestRateHealthTimeline);
         template.addLineChart("Půjčky s max. 30 dny prodlení podle data originace a ratingu [%]", "Datum originace",
                               "Úroková míra [% p.a.]", "Nejvýše 30 dní v prodlení z originovaných [%]",
                               Main::interestRate30DayTimeline);
-        template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
-                              "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
-                              Main::interestRateDefaultTimeline);
+
+         */
         template.run();
         saveJs("canvg.js");
         saveJs("rgbcolor.js");

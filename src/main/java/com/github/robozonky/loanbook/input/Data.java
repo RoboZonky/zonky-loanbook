@@ -157,6 +157,7 @@ public final class Data {
     }
 
     public Stream<DataRow> getAll() {
-        return rows.stream();
+        return rows.stream()
+                .filter(r -> !r.getIncomeType().equals("Nezaměstnaný")); // statistical fluke, no longer used; 7 items
     }
 }
