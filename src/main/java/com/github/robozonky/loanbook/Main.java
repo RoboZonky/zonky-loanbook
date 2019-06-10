@@ -300,7 +300,7 @@ public class Main {
                 final long totalFilteredCount = byInterestRateAndSecondFiltered.values().stream()
                         .mapToLong(map -> map.getOrDefault(matches, Collections.emptyList()).size())
                         .sum();
-                final String partValue = matches ? "Má" : "Nemá";
+                final String partValue = matches ? "Ano" : "Ne";
                 final String value = partValue + " (" + totalFilteredCount + " z " + totalCount + ")";
                 final BigDecimal result = count == 0 ?
                         BigDecimal.ZERO :
@@ -323,6 +323,14 @@ public class Main {
     private static void interestRateStoryRiskChart(final Data data,
                                                    final Consumer<Tuple3<String, String, Number>> adder) {
         abstractInterestRateHealthBinary(data.getAll(), DataRow::isDefaulted, DataRow::isStory, adder);
+    }
+
+    private static void interestRateInvestorRiskChart(final Data data,
+                                                      final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractInterestRateHealthBinary(data.getAll(), DataRow::isDefaulted, r -> r.getBecameInvestor()
+                                                 .map(became -> became.isBefore(r.getOrigin()) || became.isEqual(r.getOrigin()))
+                                                 .orElse(false),
+                                         adder);
     }
 
     private static void storyAndInsuranceTimelineChart(final Data data,
@@ -353,6 +361,9 @@ public class Main {
         template.addColumnChart("Zesplatněné půjčky podle pojištění, od jeho zavedení", "Má pojištění?",
                                 "Úroková míra [% p.a.]", "Zesplatněno z celku [%]",
                                 Main::interestRateInsuranceRiskChart);
+        template.addColumnChart("Zesplatněné půjčky podle statusu investora", "Byl při originaci investorem?",
+                                "Úroková míra [% p.a.]",
+                                "Zesplatněno z celku [%]", Main::interestRateInvestorRiskChart);
         template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
                               "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
                               Main::interestRateDefaultTimeline);
