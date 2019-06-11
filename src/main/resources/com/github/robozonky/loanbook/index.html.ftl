@@ -2,6 +2,15 @@
 <html>
     <head>
         <title>Zonky loanbook v barvách</title>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-121920303-2"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        
+          gtag('config', 'UA-121920303-2');
+        </script>
         <script src="https://www.gstatic.com/charts/loader.js" defer></script>
         <!-- Store this locally as the updated versions available online throw all kinds of errors. -->
         <script src="rgbcolor.js" defer></script>
