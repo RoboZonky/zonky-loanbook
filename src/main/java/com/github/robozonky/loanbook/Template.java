@@ -33,7 +33,7 @@ final class Template implements Runnable {
         String formattedDate = localDate.format(formatter);
         final String second = data.getYearMonth().getMonthValue() + "/" + data.getYearMonth().getYear();
         this.subtitle = "Vygeneroval Lukáš Petrovický dne " + formattedDate +
-                " ze Zonky loanbooku ke konci " + second + '.';
+                " ze Zonky loanbooku k " + second + '.';
     }
 
     private static Configuration getFreemarkerConfiguration(final Class<?> templateRoot) {

@@ -1,18 +1,19 @@
 package com.github.robozonky.loanbook.input;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Optional;
 
 public final class DataRow {
 
+    private final YearMonth reportDate;
     private final String userId;
     private final String region;
     private final String incomeType;
+    private final boolean additionalIncome;
     private final String purpose;
     private final Ratio interestRate;
     private final Money amount;
-    private final LocalDate origin;
+    private final YearMonth origin;
     private final int loanCount;
     private final boolean insured;
     private final String status;
@@ -35,22 +36,25 @@ public final class DataRow {
     private final Money penaltyPaidAmount;
     private final Money principalRemainingAmount;
     private final Money interestRemainingAmount;
-    private final LocalDate becameInvestor;
+    private final YearMonth becameInvestor;
     private final boolean story;
     private final int investmentCount;
 
-    DataRow(final String userId, final String region, final String incomeType, final String purpose,
-            final Ratio interestRate, final Money amount, final LocalDate origin, final int loanCount,
-            final boolean insured, final String status, final Money paidEarlyAmount, final int postponedInstalmentCount,
-            final int daysPastDue, final Money amountOverdue, final YearMonth lastDelinquent, final int maxDaysPastDue,
+    DataRow(final YearMonth reportDate, final String userId, final String region, final String incomeType,
+            final boolean additionalIncome, final String purpose, final Ratio interestRate, final Money amount,
+            final YearMonth origin, final int loanCount, final boolean insured, final String status,
+            final Money paidEarlyAmount, final int postponedInstalmentCount, final int daysPastDue,
+            final Money amountOverdue, final YearMonth lastDelinquent, final int maxDaysPastDue,
             final int lateInstalmentCount, final Money maxAmountOverdue, final boolean defaulted,
             final int originalInstalmentCount, final int currentInstalmentCount, final int remainingInstalmentCount,
             final Ratio lost, final YearMonth finished, final Money principalPaidAmount, final Money interestPaidAmount,
             final Money penaltyPaidAmount, final Money principalRemainingAmount, final Money interestRemainingAmount,
-            final LocalDate becameInvestor, final boolean story, final int investmentCount) {
+            final YearMonth becameInvestor, final boolean story, final int investmentCount) {
+        this.reportDate = reportDate;
         this.userId = userId;
         this.region = region;
         this.incomeType = incomeType;
+        this.additionalIncome = additionalIncome;
         this.purpose = purpose;
         this.interestRate = interestRate;
         this.amount = amount;
@@ -82,6 +86,10 @@ public final class DataRow {
         this.investmentCount = investmentCount;
     }
 
+    public YearMonth getReportDate() {
+        return reportDate;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -92,6 +100,10 @@ public final class DataRow {
 
     public String getIncomeType() {
         return incomeType;
+    }
+
+    public boolean isAdditionalIncome() {
+        return additionalIncome;
     }
 
     public String getPurpose() {
@@ -106,7 +118,7 @@ public final class DataRow {
         return amount;
     }
 
-    public LocalDate getOrigin() {
+    public YearMonth getOrigin() {
         return origin;
     }
 
@@ -198,7 +210,7 @@ public final class DataRow {
         return interestRemainingAmount;
     }
 
-    public Optional<LocalDate> getBecameInvestor() {
+    public Optional<YearMonth> getBecameInvestor() {
         return Optional.ofNullable(becameInvestor);
     }
 

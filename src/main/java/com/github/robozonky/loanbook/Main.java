@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.YearMonth;
@@ -245,7 +246,7 @@ public class Main {
         final SortedMap<YearMonth, List<DataRow>> all =
                 data.getAll().collect(
                         collectingAndThen(
-                                groupingBy(r -> YearMonth.from(r.getOrigin()),
+                                groupingBy(r -> r.getOrigin(),
                                            toList()),
                                 TreeMap::new
                         ));
@@ -328,7 +329,7 @@ public class Main {
     private static void interestRateInvestorRiskChart(final Data data,
                                                       final Consumer<Tuple3<String, String, Number>> adder) {
         abstractInterestRateHealthBinary(data.getAll(), DataRow::isDefaulted, r -> r.getBecameInvestor()
-                                                 .map(became -> became.isBefore(r.getOrigin()) || became.isEqual(r.getOrigin()))
+                                                 .map(became -> became.isBefore(r.getOrigin()) || became.equals(r.getOrigin()))
                                                  .orElse(false),
                                          adder);
     }
@@ -340,38 +341,44 @@ public class Main {
                          Tuple.of("S příběhem [%]", Main::storiedToTotalRatio));
     }
 
-    public static void main(final String... args) {
-        final XLSXDownloader downloader = new XLSXDownloader();
-        final InputStream s = downloader.get().orElseThrow(() -> new IllegalStateException("No loanbook available."));
-        final XLSXConverter c = new XLSXConverter();
-        final String[][] result = c.apply(s);
-        final Template template = new Template(Data.process(result));
-        template.addBarChart("Zesplatněné půjčky podle účelu", "Účel", "Úroková míra [% p.a.]",
-                             "Zesplatněno z celku [%]", Main::purposeRiskChart);
-        template.addBarChart("Zesplatněné půjčky podle kraje", "Kraj", "Úroková míra [% p.a.]",
-                             "Zesplatněno z celku [%]", Main::regionRiskChart);
-        template.addBarChart("Zesplatněné půjčky podle zdroje příjmu žadatele", "Zdroj příjmu", "Úroková míra [% p.a.]",
-                             "Zesplatněno z celku [%]", Main::incomeRiskChart);
-        template.addBarChart("Zesplatněné půjčky podle výše úvěru", "Výše úvěru [tis. Kč]", "Úroková míra [% p.a.]",
-                             "Zesplatněno z celku [%]", Main::principalRiskChart);
-        template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]", "Úroková míra [% p.a.]",
-                             "Zesplatněno z celku [%]", Main::termRiskChart);
-        template.addColumnChart("Zesplatněné půjčky podle příběhu", "Má příběh?", "Úroková míra [% p.a.]",
-                                "Zesplatněno z celku [%]", Main::interestRateStoryRiskChart);
-        template.addColumnChart("Zesplatněné půjčky podle pojištění, od jeho zavedení", "Má pojištění?",
-                                "Úroková míra [% p.a.]", "Zesplatněno z celku [%]",
-                                Main::interestRateInsuranceRiskChart);
-        template.addColumnChart("Zesplatněné půjčky podle statusu investora", "Byl při originaci investorem?",
-                                "Úroková míra [% p.a.]",
-                                "Zesplatněno z celku [%]", Main::interestRateInvestorRiskChart);
-        template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
-                              "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
-                              Main::interestRateDefaultTimeline);
-        template.addLineChart("Zesplatnění, příběhy a pojištění podle data originace", "Datum originace",
-                              "", "", Main::storyAndInsuranceTimelineChart);
-        template.run();
-        saveJs("canvg.js");
-        saveJs("rgbcolor.js");
-        saveJs("svgprint.js");
+    public static void main(final String... args) throws IOException {
+        if (args.length != 1) {
+            throw new IllegalArgumentException("Expecting one argument, URL of the loanbook.");
+        }
+        final URL url = new URL(args[0]);
+        try (final InputStream s = url.openStream()){
+            final XLSXConverter c = new XLSXConverter();
+            final String[][] result = c.apply(s);
+            final Template template = new Template(Data.process(result));
+            template.addBarChart("Zesplatněné půjčky podle účelu", "Účel", "Úroková míra [% p.a.]",
+                                 "Zesplatněno z celku [%]", Main::purposeRiskChart);
+            template.addBarChart("Zesplatněné půjčky podle kraje", "Kraj", "Úroková míra [% p.a.]",
+                                 "Zesplatněno z celku [%]", Main::regionRiskChart);
+            template.addBarChart("Zesplatněné půjčky podle zdroje příjmu žadatele", "Zdroj příjmu",
+                                 "Úroková míra [% p.a.]",
+                                 "Zesplatněno z celku [%]", Main::incomeRiskChart);
+            template.addBarChart("Zesplatněné půjčky podle výše úvěru", "Výše úvěru [tis. Kč]", "Úroková míra [% p.a.]",
+                                 "Zesplatněno z celku [%]", Main::principalRiskChart);
+            template.addBarChart("Zesplatněné půjčky podle délky splácení", "Délka úvěru [měs.]",
+                                 "Úroková míra [% p.a.]",
+                                 "Zesplatněno z celku [%]", Main::termRiskChart);
+            template.addColumnChart("Zesplatněné půjčky podle příběhu", "Má příběh?", "Úroková míra [% p.a.]",
+                                    "Zesplatněno z celku [%]", Main::interestRateStoryRiskChart);
+            template.addColumnChart("Zesplatněné půjčky podle pojištění, od jeho zavedení", "Má pojištění?",
+                                    "Úroková míra [% p.a.]", "Zesplatněno z celku [%]",
+                                    Main::interestRateInsuranceRiskChart);
+            template.addColumnChart("Zesplatněné půjčky podle statusu investora", "Byl při originaci investorem?",
+                                    "Úroková míra [% p.a.]",
+                                    "Zesplatněno z celku [%]", Main::interestRateInvestorRiskChart);
+            template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
+                                  "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
+                                  Main::interestRateDefaultTimeline);
+            template.addLineChart("Zesplatnění, příběhy a pojištění podle data originace", "Datum originace",
+                                  "", "", Main::storyAndInsuranceTimelineChart);
+            template.run();
+            saveJs("canvg.js");
+            saveJs("rgbcolor.js");
+            saveJs("svgprint.js");
+        }
     }
 }

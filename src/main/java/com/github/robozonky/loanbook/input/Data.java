@@ -3,6 +3,7 @@ package com.github.robozonky.loanbook.input;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Pattern;
@@ -19,8 +20,7 @@ public final class Data {
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("[\\s\\h]+");
     private final Set<DataRow> rows = new CopyOnWriteArraySet<>();
-    private final Lazy<YearMonth> yearMonth = Lazy.of(() -> getAll().map(DataRow::getOrigin)
-            .map(YearMonth::from)
+    private final Lazy<YearMonth> yearMonth = Lazy.of(() -> getAll().map(DataRow::getReportDate)
             .max(YearMonth::compareTo)
             .orElse(YearMonth.from(LocalDate.now())));
 
@@ -31,38 +31,40 @@ public final class Data {
                 .mapToObj(i -> sheet[i])
                 .map(sheetRow -> {
                     try {
-                        return new DataRow(sheetRow[0],
+                        return new DataRow(toYearMonth(sheetRow[0]),
                                            sheetRow[1],
                                            sheetRow[2],
                                            sheetRow[3],
-                                           toRatio(sheetRow[4]),
-                                           toMoney(sheetRow[5]),
-                                           toLocalDate(sheetRow[6]),
-                                           toInt(sheetRow[7]),
-                                           toBoolean(sheetRow[8]),
-                                           sheetRow[9],
-                                           toMoney(sheetRow[10]),
-                                           toInt(sheetRow[11]),
-                                           toInt(sheetRow[12]),
-                                           toMoney(sheetRow[13]),
-                                           toYearMonth(sheetRow[14]),
-                                           toInt(sheetRow[15]),
-                                           toInt(sheetRow[16]),
-                                           toMoney(sheetRow[17]),
-                                           toBoolean(sheetRow[18]),
-                                           toInt(sheetRow[19]),
-                                           toInt(sheetRow[20]),
+                                           toBoolean(sheetRow[4]),
+                                           sheetRow[5],
+                                           toRatio(sheetRow[6]),
+                                           toMoney(sheetRow[7]),
+                                           toYearMonth(sheetRow[8]),
+                                           toInt(sheetRow[9]),
+                                           toBoolean(sheetRow[10]),
+                                           sheetRow[11],
+                                           toMoney(sheetRow[12]),
+                                           toInt(sheetRow[13]),
+                                           toInt(sheetRow[14]),
+                                           toMoney(sheetRow[15]),
+                                           toYearMonth(sheetRow[16]),
+                                           toInt(sheetRow[17]),
+                                           toInt(sheetRow[18]),
+                                           toMoney(sheetRow[19]),
+                                           toBoolean(sheetRow[20]),
                                            toInt(sheetRow[21]),
-                                           toRatio(sheetRow[22]),
-                                           toYearMonth(sheetRow[23]),
-                                           toMoney(sheetRow[24]),
-                                           toMoney(sheetRow[25]),
+                                           toInt(sheetRow[22]),
+                                           toInt(sheetRow[23]),
+                                           toRatio(sheetRow[24]),
+                                           toYearMonth(sheetRow[25]),
                                            toMoney(sheetRow[26]),
                                            toMoney(sheetRow[27]),
                                            toMoney(sheetRow[28]),
-                                           toLocalDate(sheetRow[29]),
-                                           toBoolean(sheetRow[30]),
-                                           toInt(sheetRow[31]));
+                                           toMoney(sheetRow[29]),
+                                           toMoney(sheetRow[30]),
+                                           toYearMonth(sheetRow[31]),
+                                           toBoolean(sheetRow[32]),
+                                           toInt(sheetRow[33]));
                     } catch (final Exception ex) {
                         LOGGER.warn("Failed processing {}.", sheetRow, ex);
                         return null;
@@ -110,14 +112,10 @@ public final class Data {
         if (value.trim().isEmpty()) {
             return null;
         }
-        return YearMonth.from(toLocalDate(value));
-    }
-
-    private static LocalDate toLocalDate(final String value) {
-        if (value.trim().isEmpty()) {
-            return null;
-        }
-        return LocalDate.parse(value);
+        final int[] parts = Arrays.stream(value.split("/"))
+                .mapToInt(Integer::valueOf)
+                .toArray();
+        return YearMonth.of(parts[0], parts[1]);
     }
 
     private static int toInt(final String value) {
@@ -127,7 +125,9 @@ public final class Data {
     private static String cleanupDecimal(final String value) {
         return WHITESPACE_PATTERN.matcher(value)
                 .replaceAll("")
-                .replace(",", ".");
+                .replace(",", ".")
+                .replace("Kč", "")
+                .trim();
     }
 
     private static Ratio toRatio(final String value) {
