@@ -1,4 +1,4 @@
-package com.github.robozonky.loanbook;
+package com.github.robozonky.loanbook.charts;
 
 import java.util.Comparator;
 import java.util.Objects;

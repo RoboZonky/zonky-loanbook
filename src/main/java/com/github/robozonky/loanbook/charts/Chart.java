@@ -1,42 +1,20 @@
 package com.github.robozonky.loanbook.charts;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 
-public abstract class Chart {
+public interface Chart {
 
-    private static final AtomicInteger ID_GENERATOR = new AtomicInteger();
+    int getId();
 
-    private final int id;
-    private final int axisCount;
-    private final ChartType type;
-    private final String title;
-    private final String subtitle;
+    int getAxisCount();
 
-    protected Chart(final ChartType type, final int axisCount, final String title, final String subtitle) {
-        this.id = ID_GENERATOR.getAndIncrement();
-        this.axisCount = axisCount;
-        this.type = type;
-        this.title = title;
-        this.subtitle = subtitle;
-    }
+    ChartType getType();
 
-    public int getId() {
-        return id;
-    }
+    String getTitle();
 
-    public int getAxisCount() {
-        return axisCount;
-    }
+    String getSubtitle();
 
-    public ChartType getType() {
-        return type;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getSubtitle() {
-        return subtitle;
+    default Optional<String> getComment() {
+        return Optional.empty();
     }
 }

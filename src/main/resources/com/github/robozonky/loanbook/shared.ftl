@@ -25,6 +25,9 @@
 <#macro chartMeta chart>
     <div id="<@htmlId chart />">
         <div id="<@htmlIdInteractive chart />" style="width: 1280px; height: 720px;"></div>
+        <#if chart.getComment().isPresent()>
+            <div id="<@htmlId chart />-comment"><p>Poznámka: ${chart.getComment().get()}</p></div>
+        </#if>
         <div id='<@htmlIdPng chart />'>
             <input type='button' value='Stáhnout jako PNG' onclick="generate('<@htmlId chart />.png', document.getElementById('<@htmlIdInteractive chart />').getElementsByTagName('svg')[0]);" />
         </div>
