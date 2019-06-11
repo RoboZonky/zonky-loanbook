@@ -149,6 +149,10 @@ public class Main {
         }, adder);
     }
 
+    private static void previousLoansRiskChart(final Data data, final Consumer<Tuple3<String, String, Number>> adder) {
+        abstractRiskChartCustomSorted(data, r -> new CustomSortString("" + (r.getLoanCount() - 1), r.getLoanCount()), adder);
+    }
+
     private static void saveJs(final String filename) {
         try (final InputStream s = Main.class.getResourceAsStream(filename)) {
             final byte[] bytes = s.readAllBytes();
@@ -370,6 +374,9 @@ public class Main {
             template.addColumnChart("Zesplatněné půjčky podle statusu investora", "Byl při originaci investorem?",
                                     "Úroková míra [% p.a.]",
                                     "Zesplatněno z celku [%]", Main::interestRateInvestorRiskChart);
+            template.addColumnChart("Zesplatněné půjčky podle počtu předchozích půjček", "Počet předchozích půjček",
+                                    "Úroková míra [% p.a.]",
+                                    "Zesplatněno z celku [%]", Main::previousLoansRiskChart);
             template.addLineChart("Zesplatnění podle data originace a ratingu [%]", "Datum originace",
                                   "Úroková míra [% p.a.]", "Zesplatněno z originovaných [%]",
                                   Main::interestRateDefaultTimeline);
