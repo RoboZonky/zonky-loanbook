@@ -1,5 +1,6 @@
 package com.github.robozonky.loanbook.charts;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.github.robozonky.loanbook.input.Data;
@@ -36,5 +37,10 @@ public final class PrincipalRiskChart extends AbstractRiskXYZChart {
     @Override
     public String getTitle() {
         return "Zesplatněné půjčky podle výše úvěru";
+    }
+
+    @Override
+    public Optional<String> getComment() {
+        return Optional.of("První půjčka nad 500 tis. Kč byla poskytnuta na konci r. 2016. Půjčky nad tuto částku tedy mohou být o něco mladší než ostatní.");
     }
 }
