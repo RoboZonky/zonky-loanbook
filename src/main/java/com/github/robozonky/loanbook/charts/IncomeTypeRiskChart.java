@@ -36,6 +36,6 @@ public final class IncomeTypeRiskChart extends AbstractRiskXYZChart {
 
     @Override
     public String getTitle() {
-        return "Zesplatněné půjčky podle účelu";
+        return "Zesplatněné půjčky podle zdroje příjmu";
     }
 }

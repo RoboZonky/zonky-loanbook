@@ -41,7 +41,7 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
         final SortedMap<YearMonth, List<DataRow>> all =
                 data.collect(
                         collectingAndThen(
-                                groupingBy(r -> r.getOrigin(),
+                                groupingBy(DataRow::getOrigin,
                                            toList()),
                                 TreeMap::new
                         ));
