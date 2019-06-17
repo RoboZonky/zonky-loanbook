@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import com.github.robozonky.loanbook.charts.IncomeTypeRiskChart;
 import com.github.robozonky.loanbook.charts.InsuranceRiskChart;
+import com.github.robozonky.loanbook.charts.InterestRateDefaultRatesTimelineChart;
 import com.github.robozonky.loanbook.charts.InterestRateDefaultTimelineChart;
 import com.github.robozonky.loanbook.charts.InvestorRiskChart;
 import com.github.robozonky.loanbook.charts.PreviousLoansRiskChart;
@@ -17,6 +18,7 @@ import com.github.robozonky.loanbook.charts.RegionRiskChart;
 import com.github.robozonky.loanbook.charts.StoryAndInsuranceTimelineChart;
 import com.github.robozonky.loanbook.charts.StoryRiskChart;
 import com.github.robozonky.loanbook.charts.TermRiskChart;
+import com.github.robozonky.loanbook.charts.VintageDefaultRatesTimelineChart;
 import com.github.robozonky.loanbook.input.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,6 +58,8 @@ public class Main {
             template.addXYZChart(PreviousLoansRiskChart::new);
             // line charts
             template.addXYZChart(InterestRateDefaultTimelineChart::new);
+            template.addXYZChart(InterestRateDefaultRatesTimelineChart::new);
+            template.addXYZChart(VintageDefaultRatesTimelineChart::new);
             template.addXYZChart(StoryAndInsuranceTimelineChart::new);
             /*
             template.addXYZChart(AverageInvestmentTimelineChart::new);
