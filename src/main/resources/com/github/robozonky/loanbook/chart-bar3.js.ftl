@@ -24,7 +24,7 @@
                 },
             },
             <#if chart.isRatingsAsSeries()><#include "ratings.js.ftl">,</#if>
-            isStacked: ${chart.isStacked()?c}
+            isStacked: ${chart.getStacking().getGoogleCode()}
         };
         var chart_div = document.getElementById('<@htmlIdInteractive chart />');
         var chart = new google.charts.Bar(chart_div);

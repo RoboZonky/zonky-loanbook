@@ -17,6 +17,7 @@ import com.github.robozonky.loanbook.charts.PurposeRiskChart;
 import com.github.robozonky.loanbook.charts.RegionRiskChart;
 import com.github.robozonky.loanbook.charts.StoryAndInsuranceTimelineChart;
 import com.github.robozonky.loanbook.charts.StoryRiskChart;
+import com.github.robozonky.loanbook.charts.SummaryInterestRateTimelineChart;
 import com.github.robozonky.loanbook.charts.TermRiskChart;
 import com.github.robozonky.loanbook.charts.VintageDefaultRatesTimelineChart;
 import com.github.robozonky.loanbook.input.Data;
@@ -61,6 +62,7 @@ public class Main {
             template.addXYZChart(InterestRateDefaultRatesTimelineChart::new);
             template.addXYZChart(VintageDefaultRatesTimelineChart::new);
             template.addXYZChart(StoryAndInsuranceTimelineChart::new);
+            template.addXYZChart(SummaryInterestRateTimelineChart::new);
             template.run();
             saveJs("canvg.js");
             saveJs("rgbcolor.js");

@@ -112,8 +112,8 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
     }
 
     @Override
-    public boolean isStacked() {
-        return false;
+    public StackingType getStacking() {
+        return StackingType.NONE;
     }
 
     @Override

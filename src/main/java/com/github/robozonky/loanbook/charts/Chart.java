@@ -8,8 +8,6 @@ public interface Chart {
 
     int getAxisCount();
 
-    boolean isStacked();
-
     boolean isRatingsAsSeries();
 
     ChartType getType();

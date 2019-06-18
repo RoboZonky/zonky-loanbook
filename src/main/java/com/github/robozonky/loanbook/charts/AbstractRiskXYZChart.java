@@ -151,8 +151,8 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
     }
 
     @Override
-    public boolean isStacked() {
-        return true;
+    public StackingType getStacking() {
+        return StackingType.ABSOLUTE;
     }
 
     @Override
