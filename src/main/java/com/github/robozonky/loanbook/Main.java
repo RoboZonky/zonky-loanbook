@@ -61,11 +61,6 @@ public class Main {
             template.addXYZChart(InterestRateDefaultRatesTimelineChart::new);
             template.addXYZChart(VintageDefaultRatesTimelineChart::new);
             template.addXYZChart(StoryAndInsuranceTimelineChart::new);
-            /*
-            template.addXYZChart(AverageInvestmentTimelineChart::new);
-            template.addXYZChart(AverageSmallInvestmentTimelineChart::new);
-            template.addXYZChart(AverageShortInvestmentTimelineChart::new);
-             */
             template.run();
             saveJs("canvg.js");
             saveJs("rgbcolor.js");
