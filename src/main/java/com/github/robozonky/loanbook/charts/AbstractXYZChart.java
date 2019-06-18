@@ -26,8 +26,6 @@ public abstract class AbstractXYZChart extends AbstractChart {
         processor.accept(getApplicableDataRows(), tuple -> add(tuple._1, tuple._2, tuple._3));
     }
 
-    public abstract boolean isRatingsAsSeries();
-
     public abstract String getLabelForX();
 
     public abstract String getLabelForY();

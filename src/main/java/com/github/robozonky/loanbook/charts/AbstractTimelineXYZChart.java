@@ -112,6 +112,11 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
     }
 
     @Override
+    public boolean isStacked() {
+        return false;
+    }
+
+    @Override
     public String getLabelForX() {
         return "Datum originace";
     }

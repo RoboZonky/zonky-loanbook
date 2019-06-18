@@ -21,8 +21,9 @@
                 y: {
                   0: {label: '${chart.getLabelForZ()}'}
                 },
-            }
-            <#if chart.isRatingsAsSeries()>,<#include "ratings.js.ftl"></#if>
+            },
+            <#if chart.isRatingsAsSeries()><#include "ratings.js.ftl">,</#if>
+            isStacked: ${chart.isStacked()?c}
         };
         var chart_div = document.getElementById('<@htmlIdInteractive chart />');
         var chart = new google.charts.Line(chart_div);

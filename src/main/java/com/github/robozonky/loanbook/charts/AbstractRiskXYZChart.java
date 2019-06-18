@@ -151,6 +151,11 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
     }
 
     @Override
+    public boolean isStacked() {
+        return true;
+    }
+
+    @Override
     public boolean isRatingsAsSeries() {
         return true;
     }
