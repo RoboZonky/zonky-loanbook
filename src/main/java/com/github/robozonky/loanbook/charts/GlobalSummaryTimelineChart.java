@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -14,12 +15,12 @@ import io.vavr.Tuple;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.summingInt;
+import static java.util.stream.Collectors.summingLong;
 
-public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
+public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
 
-    public SummaryTimelineChart(final Data data) {
-        super(data, SummaryTimelineChart::storyAndInsuranceTimelineChart);
+    public GlobalSummaryTimelineChart(final Data data) {
+        super(data, GlobalSummaryTimelineChart::storyAndInsuranceTimelineChart);
     }
 
     private static Number somethingToTotalRatio(final List<DataRow> data, final Predicate<DataRow> include) {
@@ -32,10 +33,10 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
     }
 
     private static Number sumWeightedInterestRate(final List<DataRow> data) {
-        final Map<Ratio, Integer> collect = data.stream()
+        final Map<Ratio, Long> collect = data.stream()
                 .collect(groupingBy(DataRow::getInterestRate,
-                                    summingInt(r -> r.getAmount().intValue())));
-        final double total = collect.values().stream().mapToInt(i -> i).sum();
+                                    summingLong(r -> r.getAmount().intValue())));
+        final double total = collect.values().stream().mapToLong(i -> i).sum();
         return collect.entrySet().stream()
                 .map(e -> e.getKey().doubleValue() * (e.getValue() / total))
                 .map(e -> e * 100)
@@ -79,20 +80,25 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
 
     private static void storyAndInsuranceTimelineChart(final Stream<DataRow> data,
                                                        final XYZChartDataConsumer adder) {
-        abstractOriginationTimeline(data, adder,
+        abstractGlobalTimeline(data, adder,
                          Tuple.of("Objemem vážený průměrný úrok [% p.a.]",
-                                  SummaryTimelineChart::sumWeightedInterestRate),
+                                  GlobalSummaryTimelineChart::sumWeightedInterestRate),
                          Tuple.of("Počtem vážený průměrný úrok [% p.a.]",
-                                  SummaryTimelineChart::countWeightedInterestRate),
-                         Tuple.of("Ztraceno [% objemu]", SummaryTimelineChart::lostToTotalRatio),
-                         Tuple.of("Zesplatněno [% půjček]", SummaryTimelineChart::defaultedToTotalRatio),
-                         Tuple.of("S pojištěním [% půjček]", SummaryTimelineChart::insuredToTotalRatio),
-                         Tuple.of("Bez příběhu [% půjček]", SummaryTimelineChart::unstoriedToTotalRatio));
+                                  GlobalSummaryTimelineChart::countWeightedInterestRate),
+                         Tuple.of("Ztraceno [% objemu]", GlobalSummaryTimelineChart::lostToTotalRatio),
+                         Tuple.of("Zesplatněno [% půjček]", GlobalSummaryTimelineChart::defaultedToTotalRatio),
+                         Tuple.of("S pojištěním [% půjček]", GlobalSummaryTimelineChart::insuredToTotalRatio),
+                         Tuple.of("Bez příběhu [% půjček]", GlobalSummaryTimelineChart::unstoriedToTotalRatio));
     }
 
     @Override
     public boolean isRatingsAsSeries() {
         return false;
+    }
+
+    @Override
+    public String getLabelForX() {
+        return "Měsíc";
     }
 
     @Override
@@ -107,6 +113,11 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
 
     @Override
     public String getTitle() {
-        return "Souhrnné statistiky podle data originace";
+        return "Souhrnné statistiky platformy";
+    }
+
+    @Override
+    public Optional<String> getComment() {
+        return Optional.of("Do daného měsíce počítáme všechny v tu dobu aktivní půjčky v platformě.");
     }
 }

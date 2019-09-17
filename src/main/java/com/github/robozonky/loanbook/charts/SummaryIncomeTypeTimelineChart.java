@@ -49,7 +49,7 @@ public final class SummaryIncomeTypeTimelineChart extends AbstractTimelineXYZCha
         final Tuple2<String, Function<List<DataRow>, Number>>[] series = all.keySet().stream()
                 .map(SummaryIncomeTypeTimelineChart::convert)
                 .toArray((IntFunction<Tuple2<String, Function<List<DataRow>, Number>>[]>) Tuple2[]::new);
-        abstractTimeline(all.values().stream().flatMap(Collection::stream), adder, series);
+        abstractOriginationTimeline(all.values().stream().flatMap(Collection::stream), adder, series);
     }
 
     @Override

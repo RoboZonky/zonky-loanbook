@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.github.robozonky.loanbook.charts.GlobalSummaryTimelineChart;
 import com.github.robozonky.loanbook.charts.IncomeTypeRiskChart;
 import com.github.robozonky.loanbook.charts.InsuranceRiskChart;
 import com.github.robozonky.loanbook.charts.InterestRateDefaultRatesTimelineChart;
@@ -64,6 +65,7 @@ public class Main {
             template.addXYZChart(InterestRateDefaultTimelineChart::new);
             template.addXYZChart(InterestRateDefaultRatesTimelineChart::new);
             template.addXYZChart(VintageDefaultRatesTimelineChart::new);
+            template.addXYZChart(GlobalSummaryTimelineChart::new);
             template.addXYZChart(SummaryTimelineChart::new);
             template.addXYZChart(SummaryInterestRateTimelineChart::new);
             template.addXYZChart(SummaryPurposeTimelineChart::new);

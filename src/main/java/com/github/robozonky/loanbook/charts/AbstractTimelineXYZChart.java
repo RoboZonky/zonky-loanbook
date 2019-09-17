@@ -3,6 +3,7 @@ package com.github.robozonky.loanbook.charts;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,16 +36,20 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
         super(data, processor);
     }
 
-    protected static void abstractTimeline(final Stream<DataRow> data,
-                                           final XYZChartDataConsumer adder,
-                                           final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
-        final SortedMap<YearMonth, List<DataRow>> all =
-                data.collect(
-                        collectingAndThen(
-                                groupingBy(DataRow::getOrigin,
-                                           toList()),
-                                TreeMap::new
-                        ));
+    protected static void abstractOriginationTimeline(final Stream<DataRow> data,
+            final XYZChartDataConsumer adder, final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+        abstractTimeline(data, adder, d -> d.collect(
+                collectingAndThen(
+                        groupingBy(DataRow::getOrigin,
+                                toList()),
+                        TreeMap::new
+                )), metrics);
+    }
+
+    protected static void abstractTimeline(final Stream<DataRow> data, final XYZChartDataConsumer adder,
+            final Function<Stream<DataRow>, SortedMap<YearMonth, List<DataRow>>> mapper,
+            final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+        final SortedMap<YearMonth, List<DataRow>> all = mapper.apply(data);
         all.forEach((yearMonth, rows) -> {
             for (final Tuple2<String, Function<List<DataRow>, Number>> metric : metrics) {
                 final Number raw = metric._2.apply(rows);
@@ -54,17 +59,38 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
         });
     }
 
+    private static SortedMap<YearMonth, List<DataRow>> allActiveUntilGivenDate(final Stream<DataRow> data) {
+        final SortedMap<YearMonth, List<DataRow>> result = new TreeMap<>();
+        data.forEach(row -> {
+            final YearMonth started = row.getOrigin();
+            final YearMonth finished = row.getFinished().orElse(row.getReportDate().minusMonths(1));
+            YearMonth current = started;
+            do {
+                final List<DataRow> matching = result.computeIfAbsent(current, key -> new ArrayList<>());
+                matching.add(row);
+                current = current.plusMonths(1);
+            } while (!current.isAfter(finished));
+        });
+        return result;
+    }
+
+    protected static void abstractGlobalTimeline(final Stream<DataRow> data,
+            final XYZChartDataConsumer adder,
+            final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+        abstractTimeline(data, adder, AbstractTimelineXYZChart::allActiveUntilGivenDate, metrics);
+    }
+
     protected static void abstractInterestRateHealthTimeline(final Stream<DataRow> data,
-                                                             final Predicate<DataRow> howHealthy,
-                                                             final XYZChartDataConsumer adder) {
+            final Predicate<DataRow> howHealthy,
+            final XYZChartDataConsumer adder) {
         final TreeMap<YearMonth, TreeMap<Ratio, List<DataRow>>> byMonthAndRating =
                 data.collect(
                         collectingAndThen(
                                 groupingBy(r -> YearMonth.from(r.getOrigin()),
-                                           collectingAndThen(
-                                                   groupingBy(DataRow::getInterestRate,
-                                                              toList()),
-                                                   TreeMap::new)),
+                                        collectingAndThen(
+                                                groupingBy(DataRow::getInterestRate,
+                                                        toList()),
+                                                TreeMap::new)),
                                 TreeMap::new
                         ));
         // count totals

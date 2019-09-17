@@ -49,7 +49,7 @@ public final class SummaryRegionTimelineChart extends AbstractTimelineXYZChart {
         final Tuple2<String, Function<List<DataRow>, Number>>[] series = all.keySet().stream()
                 .map(SummaryRegionTimelineChart::convert)
                 .toArray((IntFunction<Tuple2<String, Function<List<DataRow>, Number>>[]>) Tuple2[]::new);
-        abstractTimeline(all.values().stream().flatMap(Collection::stream), adder, series);
+        abstractOriginationTimeline(all.values().stream().flatMap(Collection::stream), adder, series);
     }
 
     @Override
