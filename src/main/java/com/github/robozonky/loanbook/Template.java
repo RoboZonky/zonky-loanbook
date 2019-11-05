@@ -40,7 +40,9 @@ final class Template implements Runnable {
     private void process(final String filename) {
         try (final var writer = Files.newBufferedWriter(Path.of(filename))) {
             final Map<String, Object> data = new LinkedHashMap<>();
-            data.put("data", Map.of("charts", charts, "now", Date.from(Instant.now())));
+            data.put("data", Map.of("charts", charts,
+                    "now", Date.from(Instant.now()),
+                    "period", this.data.getYearMonth()));
             getFreemarkerConfiguration(Main.class)
                     .getTemplate(filename + ".ftl")
                     .process(data, writer);

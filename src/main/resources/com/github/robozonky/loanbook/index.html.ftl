@@ -1,7 +1,7 @@
 <#include "shared.ftl">
 <html>
     <head>
-        <title>Zonky loanbook v barvách</title>
+        <title>Zonky loanbook v barvách (${data.period})</title>
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-121920303-2"></script>
         <script>
@@ -20,7 +20,7 @@
         <script src="charts.js" defer></script>
     </head>
     <body>
-        <h1>Zonky loanbook v barvách</h1>
+        <h1>Zonky loanbook v barvách (${data.period})</h1>
         <ul>
             <li>Tato stránka poskytuje vizualizaci dat z loanbooku investiční platformy Zonky. Mějte na paměti, že <strong>může obsahovat chyby</strong>, nikdo není neomylný.</li>
             <li>Stránka aktualizována nahodile, zpravidla jednou za měsíc. Poslední aktualizace proběhla ${data.now?date} v ${data.now?time}.</li>
