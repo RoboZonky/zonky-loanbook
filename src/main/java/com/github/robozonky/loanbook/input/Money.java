@@ -1,15 +1,23 @@
 package com.github.robozonky.loanbook.input;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public final class Money extends Number implements Comparable<Money> {
+
+    private static final Map<String, Money> CACHE = new HashMap<>();
+
+    public static Money getInstance(final String value) {
+        return CACHE.computeIfAbsent(value, v -> new Money(new BigDecimal(v)));
+    }
 
     public static final Money ZERO = new Money(BigDecimal.ZERO);
 
     private final BigDecimal value;
 
-    Money(final BigDecimal bigDecimal) {
+    private Money(final BigDecimal bigDecimal) {
         this.value = bigDecimal;
     }
 

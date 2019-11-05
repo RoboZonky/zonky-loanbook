@@ -1,19 +1,29 @@
 package com.github.robozonky.loanbook.input;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public final class Ratio extends Number implements Comparable<Ratio> {
+
+    private static final Map<BigDecimal, Ratio> CACHE = new HashMap<>();
+
+    public static Ratio getInstance(final BigDecimal value) {
+        final BigDecimal adjustedValue = value.setScale(3, RoundingMode.HALF_EVEN);
+        return CACHE.computeIfAbsent(adjustedValue, Ratio::new);
+    }
 
     public static final Ratio ZERO = new Ratio(BigDecimal.ZERO);
     private static final DecimalFormatSymbols FORMAT_SYMBOLS = new DecimalFormatSymbols(Locale.forLanguageTag("cs_CZ"));
     private static final DecimalFormat FORMAT = new DecimalFormat("##.## %", FORMAT_SYMBOLS);
     private final BigDecimal value;
 
-    public Ratio(final BigDecimal bigDecimal) {
+    private Ratio(final BigDecimal bigDecimal) {
         this.value = bigDecimal;
     }
 

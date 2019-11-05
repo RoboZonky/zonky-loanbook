@@ -29,7 +29,7 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
                 .count();
         final BigDecimal ratio = BigDecimal.valueOf(stories)
                 .divide(BigDecimal.valueOf(data.size()), 4, RoundingMode.HALF_EVEN);
-        return new Ratio(ratio);
+        return Ratio.getInstance(ratio);
     }
 
     private static Number sumWeightedInterestRate(final List<DataRow> data) {
@@ -67,7 +67,7 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
         final double total = data.stream()
                 .mapToDouble(e -> e.getAmount().doubleValue())
                 .sum();
-        return new Ratio(BigDecimal.valueOf(collect / total));
+        return Ratio.getInstance(BigDecimal.valueOf(collect / total));
     }
 
     private static Number unstoriedToTotalRatio(final List<DataRow> data) {
