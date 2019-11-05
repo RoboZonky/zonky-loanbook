@@ -36,8 +36,8 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
         super(data, processor);
     }
 
-    protected static void abstractOriginationTimeline(final Stream<DataRow> data,
-            final XYZChartDataConsumer adder, final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+    protected static <T extends Comparable<?>> void abstractOriginationTimeline(final Stream<DataRow> data,
+            final XYZChartDataConsumer adder, final Tuple2<T, Function<List<DataRow>, Number>>... metrics) {
         abstractTimeline(data, adder, d -> d.collect(
                 collectingAndThen(
                         groupingBy(DataRow::getOrigin,
@@ -46,15 +46,16 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
                 )), metrics);
     }
 
-    protected static void abstractTimeline(final Stream<DataRow> data, final XYZChartDataConsumer adder,
+    protected static <T extends Comparable<?>> void abstractTimeline(final Stream<DataRow> data,
+            final XYZChartDataConsumer adder,
             final Function<Stream<DataRow>, SortedMap<YearMonth, List<DataRow>>> mapper,
-            final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+            final Tuple2<T, Function<List<DataRow>, Number>>... metrics) {
         final SortedMap<YearMonth, List<DataRow>> all = mapper.apply(data);
         all.forEach((yearMonth, rows) -> {
-            for (final Tuple2<String, Function<List<DataRow>, Number>> metric : metrics) {
+            for (final Tuple2<T, Function<List<DataRow>, Number>> metric : metrics) {
                 final Number raw = metric._2.apply(rows);
                 final Number value = raw instanceof Ratio ? raw.doubleValue() * 100 : raw;
-                adder.accept(Tuple.of(yearMonth.toString(), metric._1, value));
+                adder.accept(Tuple.of(yearMonth.toString(), metric._1.toString(), value));
             }
         });
     }
@@ -74,9 +75,8 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
         return result;
     }
 
-    protected static void abstractGlobalTimeline(final Stream<DataRow> data,
-            final XYZChartDataConsumer adder,
-            final Tuple2<String, Function<List<DataRow>, Number>>... metrics) {
+    protected static <T extends Comparable<?>> void abstractGlobalTimeline(final Stream<DataRow> data,
+            final XYZChartDataConsumer adder, final Tuple2<T, Function<List<DataRow>, Number>>... metrics) {
         abstractTimeline(data, adder, AbstractTimelineXYZChart::allActiveUntilGivenDate, metrics);
     }
 
