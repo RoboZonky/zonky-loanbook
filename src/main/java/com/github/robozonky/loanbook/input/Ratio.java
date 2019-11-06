@@ -14,7 +14,7 @@ public final class Ratio extends Number implements Comparable<Ratio> {
     private static final Map<BigDecimal, Ratio> CACHE = new HashMap<>();
 
     public static Ratio getInstance(final BigDecimal value) {
-        final BigDecimal adjustedValue = value.setScale(3, RoundingMode.HALF_EVEN);
+        final BigDecimal adjustedValue = value.setScale(4, RoundingMode.HALF_EVEN);
         return CACHE.computeIfAbsent(adjustedValue, Ratio::new);
     }
 
