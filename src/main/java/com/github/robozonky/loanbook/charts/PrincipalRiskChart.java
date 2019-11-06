@@ -14,9 +14,9 @@ public final class PrincipalRiskChart extends AbstractRiskXYZChart {
         final int start = (cycle * step) / 1000;
         final int end = ((cycle + 1) * step) / 1000;
         if (cycle == 0) {
-            return new CustomSortString(" do " + end, cycle);
+            return new CustomSortString("do " + end, cycle);
         } else if (cycle > 13) {
-            return new CustomSortString(" od " + start, cycle);
+            return new CustomSortString("od " + start, cycle);
         } else {
             return new CustomSortString("od " + start + " do " + end, cycle);
         }

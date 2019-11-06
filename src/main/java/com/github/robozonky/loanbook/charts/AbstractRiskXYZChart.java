@@ -26,8 +26,6 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
 
-    private static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
-
     protected AbstractRiskXYZChart(final Data data, final XYZChartDataProcessor processor) {
         super(data, processor);
     }
@@ -79,8 +77,8 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
                 final BigDecimal result = count == 0 ?
                         BigDecimal.ZERO :
                         BigDecimal.valueOf(count)
-                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
-                                .multiply(HUNDRED);
+                                .scaleByPowerOfTen(2)
+                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN);
                 adder.accept(Tuple.of(value, id, result));
             }
         });
@@ -143,8 +141,8 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
                 final BigDecimal result = defaultedCount == 0 ?
                         BigDecimal.ZERO :
                         BigDecimal.valueOf(defaultedCount)
-                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
-                                .multiply(HUNDRED);
+                                .scaleByPowerOfTen(2)
+                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN);
                 adder.accept(Tuple.of(id, ratio + " p.a.", result));
             }
         }));

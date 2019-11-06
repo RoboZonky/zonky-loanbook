@@ -22,9 +22,9 @@ public final class TermRiskChart extends AbstractRiskXYZChart {
         final int start = (cycle * step);
         final int end = ((cycle + 1) * step);
         if (cycle == 0) {
-            return new CustomSortString(" do " + end, cycle);
+            return new CustomSortString("do " + end, cycle);
         } else if (cycle > 5) {
-            return new CustomSortString(" od " + start, cycle);
+            return new CustomSortString("od " + start, cycle);
         } else {
             return new CustomSortString("od " + start + " do " + end, cycle);
         }

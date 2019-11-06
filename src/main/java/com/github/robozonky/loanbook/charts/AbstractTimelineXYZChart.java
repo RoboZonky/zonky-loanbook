@@ -30,8 +30,6 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
 
-    private static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
-
     protected AbstractTimelineXYZChart(final Data data, final XYZChartDataProcessor processor) {
         super(data, processor);
     }
@@ -55,7 +53,7 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
             for (final Tuple2<T, Function<List<DataRow>, Number>> metric : metrics) {
                 final Number raw = metric._2.apply(rows);
                 final Number value = raw instanceof Ratio ? raw.doubleValue() * 100 : raw;
-                adder.accept(Tuple.of(yearMonth.toString(), metric._1.toString(), value));
+                adder.accept(Tuple.of(yearMonth.toString(), metric._1, value));
             }
         });
     }
@@ -130,8 +128,8 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
                 final BigDecimal result = healthyCount == 0 ?
                         BigDecimal.ZERO :
                         BigDecimal.valueOf(healthyCount)
-                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN)
-                                .multiply(HUNDRED);
+                                .scaleByPowerOfTen(2)
+                                .divide(BigDecimal.valueOf(totalCount), 4, RoundingMode.HALF_EVEN);
                 adder.accept(Tuple.of(yearMonth.toString(), second + " p.a.", result));
             }
         }));

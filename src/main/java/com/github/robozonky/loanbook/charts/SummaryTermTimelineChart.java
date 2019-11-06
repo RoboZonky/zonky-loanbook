@@ -25,13 +25,17 @@ public final class SummaryTermTimelineChart extends AbstractTimelineXYZChart {
         super(data, SummaryTermTimelineChart::regionTimeline);
     }
 
+    private static CustomSortString categorize(final DataRow row) {
+        final CustomSortString original = TermRiskChart.getCategory(row);
+        return new CustomSortString(original+ " měs.", original.sortId);
+    }
+
     private static Number convert(final CustomSortString category, final List<DataRow> rows) {
         final long total = rows.size();
-        final long part = rows.stream().filter(r -> TermRiskChart.getCategory(r).equals(category)).count();
+        final long part = rows.stream().filter(r -> categorize(r).equals(category)).count();
         return BigDecimal.valueOf(part)
-                .divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_EVEN)
-                .multiply(BigDecimal.TEN)
-                .multiply(BigDecimal.TEN);
+                .scaleByPowerOfTen(2)
+                .divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_EVEN);
     }
 
     private static Tuple2<CustomSortString, Function<List<DataRow>, Number>> convert(final CustomSortString category) {
@@ -42,8 +46,7 @@ public final class SummaryTermTimelineChart extends AbstractTimelineXYZChart {
         final SortedMap<CustomSortString, List<DataRow>> all =
                 data.collect(
                         collectingAndThen(
-                                groupingBy(TermRiskChart::getCategory,
-                                           toList()),
+                                groupingBy(SummaryTermTimelineChart::categorize, toList()),
                                 TreeMap::new
                         ));
         final Tuple2<CustomSortString, Function<List<DataRow>, Number>>[] series = all.keySet().stream()

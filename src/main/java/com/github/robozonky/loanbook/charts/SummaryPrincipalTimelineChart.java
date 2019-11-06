@@ -25,9 +25,14 @@ public final class SummaryPrincipalTimelineChart extends AbstractTimelineXYZChar
         super(data, SummaryPrincipalTimelineChart::regionTimeline);
     }
 
+    private static CustomSortString categorize(final DataRow row) {
+        final CustomSortString original = PrincipalRiskChart.getCategory(row);
+        return new CustomSortString( original+ " tis. Kč", original.sortId);
+    }
+
     private static Number convert(final CustomSortString category, final List<DataRow> rows) {
         final long total = rows.size();
-        final long part = rows.stream().filter(r -> PrincipalRiskChart.getCategory(r).equals(category)).count();
+        final long part = rows.stream().filter(r -> categorize(r).equals(category)).count();
         return BigDecimal.valueOf(part)
                 .divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_EVEN)
                 .multiply(BigDecimal.TEN)
@@ -42,8 +47,7 @@ public final class SummaryPrincipalTimelineChart extends AbstractTimelineXYZChar
         final SortedMap<CustomSortString, List<DataRow>> all =
                 data.collect(
                         collectingAndThen(
-                                groupingBy(PrincipalRiskChart::getCategory,
-                                           toList()),
+                                groupingBy(SummaryPrincipalTimelineChart::categorize, toList()),
                                 TreeMap::new
                         ));
         final Tuple2<CustomSortString, Function<List<DataRow>, Number>>[] series = all.keySet().stream()

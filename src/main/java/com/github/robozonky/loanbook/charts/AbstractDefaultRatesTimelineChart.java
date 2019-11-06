@@ -90,7 +90,7 @@ abstract class AbstractDefaultRatesTimelineChart extends AbstractTimelineXYZChar
                         .divide(BigDecimal.valueOf(loanCount), 4, RoundingMode.HALF_EVEN)
                         .multiply(BigDecimal.TEN)
                         .multiply(BigDecimal.TEN);
-                final Tuple3<String, String, Number> t = Tuple.of("" + leastAge, second.toString(), result);
+                final Tuple3<String, Comparable, Number> t = Tuple.of("" + leastAge, second, result);
                 adder.accept(t);
             }
         }));

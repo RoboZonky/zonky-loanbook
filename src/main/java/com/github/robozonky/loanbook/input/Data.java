@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 public final class Data {
 
     private static final Logger LOGGER = LogManager.getLogger(Data.class);
-    private static final BigDecimal HUNDRED = BigDecimal.TEN.pow(2);
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("[\\s\\h]+");
     private static final Map<String, YearMonth> YEAR_MONTH_CACHE = new HashMap<>();
 
@@ -141,7 +140,7 @@ public final class Data {
             if (result.signum() == 0) {
                 return Ratio.ZERO;
             } else {
-                return Ratio.getInstance(result.divide(HUNDRED));
+                return Ratio.getInstance(result.scaleByPowerOfTen(-2));
             }
         } else {
             throw new IllegalStateException("Wrong ratio: " + value);

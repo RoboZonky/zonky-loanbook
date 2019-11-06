@@ -19,7 +19,7 @@ public abstract class AbstractXYZChart extends AbstractChart {
 
     private final Set<String> adaptedAxisLabels = new LinkedHashSet<>();
     private final Map<String, Map<String, Number>> adaptedData = new LinkedHashMap<>();
-    private final List<Tuple3<String, String, Number>> data = new ArrayList<>(0);
+    private final List<Tuple3<String, Comparable, Number>> data = new ArrayList<>(0);
 
     protected AbstractXYZChart(final Data data, final XYZChartDataProcessor processor) {
         super(data);
@@ -34,7 +34,7 @@ public abstract class AbstractXYZChart extends AbstractChart {
 
     public abstract String getLabelForZ();
 
-    public List<Tuple3<String, String, Number>> getData() {
+    public List<Tuple3<String, Comparable, Number>> getData() {
         return data;
     }
 
@@ -53,10 +53,10 @@ public abstract class AbstractXYZChart extends AbstractChart {
                 .collect(Collectors.toList());
     }
 
-    private void add(final String x, final String y, final Number z) {
+    private void add(final String x, final Comparable y, final Number z) {
         data.add(Tuple.of(x, y, z));
-        adaptedAxisLabels.add(y);
-        adaptedData.computeIfAbsent(x, __ -> new LinkedHashMap<>(0)).put(y, z);
+        adaptedAxisLabels.add(y.toString());
+        adaptedData.computeIfAbsent(x, __ -> new LinkedHashMap<>(0)).put(y.toString(), z);
     }
 
     @Override
