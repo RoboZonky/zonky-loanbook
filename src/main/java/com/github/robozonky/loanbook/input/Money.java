@@ -7,38 +7,40 @@ import java.util.Objects;
 
 public final class Money extends Number implements Comparable<Money> {
 
+    public static final Money ZERO = new Money(BigDecimal.ZERO);
     private static final Map<String, Money> CACHE = new HashMap<>();
+    private final int value;
+
+    private Money(final BigDecimal bigDecimal) {
+        this.value = bigDecimal.scaleByPowerOfTen(2).intValue();
+    }
 
     public static Money getInstance(final String value) {
         return CACHE.computeIfAbsent(value, v -> new Money(new BigDecimal(v)));
     }
 
-    public static final Money ZERO = new Money(BigDecimal.ZERO);
-
-    private final BigDecimal value;
-
-    private Money(final BigDecimal bigDecimal) {
-        this.value = bigDecimal;
+    private static BigDecimal descale(int value) {
+        return BigDecimal.valueOf(value).scaleByPowerOfTen(-2);
     }
 
     @Override
     public int intValue() {
-        return value.intValue();
+        return value / 100;
     }
 
     @Override
     public long longValue() {
-        return value.longValue();
+        return value / 100;
     }
 
     @Override
     public float floatValue() {
-        return value.floatValue();
+        return descale(value).floatValue();
     }
 
     @Override
     public double doubleValue() {
-        return value.doubleValue();
+        return descale(value).doubleValue();
     }
 
     @Override
@@ -60,12 +62,11 @@ public final class Money extends Number implements Comparable<Money> {
 
     @Override
     public String toString() {
-        return value.toPlainString() + " Kč";
+        return descale(value).toPlainString() + " Kč";
     }
 
     @Override
     public int compareTo(final Money money) {
-        return this.value.compareTo(money.value);
+        return Integer.compare(value, money.value);
     }
-
 }

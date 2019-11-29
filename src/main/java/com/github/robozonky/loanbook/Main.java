@@ -5,9 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.List;
 
 import com.github.robozonky.loanbook.charts.GlobalSummaryTimelineChart;
 import com.github.robozonky.loanbook.charts.IncomeTypeRiskChart;
@@ -30,6 +28,7 @@ import com.github.robozonky.loanbook.charts.SummaryTimelineChart;
 import com.github.robozonky.loanbook.charts.TermRiskChart;
 import com.github.robozonky.loanbook.charts.VintageDefaultRatesTimelineChart;
 import com.github.robozonky.loanbook.input.Data;
+import com.github.robozonky.loanbook.input.DataProcessor;
 import com.github.robozonky.loanbook.input.DataRow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,11 +47,13 @@ public class Main {
         }
     }
 
-    private static void process(final URL url, final Consumer<String[]> rowProcessor) throws IOException {
+    private static List<DataRow> process(final URL url) throws IOException {
+        final DataProcessor processor = new DataProcessor();
         try (final InputStream s = url.openStream()) {
-            final XLSXConverter c = new XLSXConverter(rowProcessor);
+            final XLSXConverter c = new XLSXConverter(processor::add);
             c.accept(s);
         }
+        return processor.getRows();
     }
 
     public static void main(final String... args) throws IOException {
@@ -60,13 +61,7 @@ public class Main {
             throw new IllegalArgumentException("Expecting one argument, URL of the loanbook.");
         }
         final URL url = new URL(args[0]);
-        final Set<DataRow> rows = new LinkedHashSet<>();
-        process(url, row -> {
-            final DataRow data = Data.process(row);
-            synchronized (rows) {
-                rows.add(data);
-            }
-        });
+        final List<DataRow> rows = process(url);
         LOGGER.info("Loaded {} data rows.", rows.size());
         final Template template = new Template(new Data(rows));
         // bar charts
