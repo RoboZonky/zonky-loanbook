@@ -79,8 +79,7 @@ public abstract class AbstractTimelineXYZChart extends AbstractXYZChart {
     }
 
     protected static void abstractInterestRateHealthTimeline(final Stream<DataRow> data,
-            final Predicate<DataRow> howHealthy,
-            final XYZChartDataConsumer adder) {
+            final Predicate<DataRow> howHealthy, final XYZChartDataConsumer adder) {
         final TreeMap<YearMonth, TreeMap<Ratio, List<DataRow>>> byMonthAndRating =
                 data.collect(
                         collectingAndThen(

@@ -29,9 +29,9 @@ public final class IncomeTypeRiskChart extends AbstractRiskXYZChart {
 
     @Override
     public Optional<String> getComment() {
-        return Optional.of("Nezahrnuje všech 7 půjček, kde žadatel byl 'Nezaměstnaný'" +
+        return Optional.of("Nezahrnuje jednotky půjček, kde žadatel byl 'Nezaměstnaný'" +
                                    " - tyto půjčky už Zonky neposkytuje a v kontextu jiných druhů příjmů " +
-                                   "tak 15 % zesplatnění (1 ks) nežádoucím způsobem zkreslovalo grafy.");
+                                   "tak 40 % zesplatnění (2 z 5 ks) nežádoucím způsobem zkreslovalo grafy.");
     }
 
     @Override

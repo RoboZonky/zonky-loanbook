@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.robozonky.loanbook.input.Data;
@@ -23,10 +24,10 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
     }
 
     private static Number somethingToTotalRatio(final List<DataRow> data, final Predicate<DataRow> include) {
-        final long stories = data.stream()
+        final long included = data.stream()
                 .filter(include)
                 .count();
-        final BigDecimal ratio = BigDecimal.valueOf(stories)
+        final BigDecimal ratio = BigDecimal.valueOf(included)
                 .divide(BigDecimal.valueOf(data.size()), 4, RoundingMode.HALF_EVEN);
         return Ratio.getInstance(ratio);
     }
@@ -74,7 +75,10 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
     }
 
     private static Number defaultedToTotalRatio(final List<DataRow> data) {
-        return somethingToTotalRatio(data, DataRow::isDefaulted);
+        final List<DataRow> updatedData = data.stream()
+                .filter(AbstractRiskXYZChart::filterForFinished)
+                .collect(Collectors.toList());
+        return somethingToTotalRatio(updatedData, DataRow::isDefaulted);
     }
 
     private static void storyAndInsuranceTimelineChart(final Stream<DataRow> data,
@@ -85,9 +89,9 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
                          Tuple.of("Počtem vážený průměrný úrok [% p.a.]",
                                   SummaryTimelineChart::countWeightedInterestRate),
                          Tuple.of("Ztraceno [% objemu]", SummaryTimelineChart::lostToTotalRatio),
-                         Tuple.of("Zesplatněno [% půjček]", SummaryTimelineChart::defaultedToTotalRatio),
-                         Tuple.of("S pojištěním [% půjček]", SummaryTimelineChart::insuredToTotalRatio),
-                         Tuple.of("Bez příběhu [% půjček]", SummaryTimelineChart::unstoriedToTotalRatio));
+                         Tuple.of("Zesplatněno [% ukončených půjček]", SummaryTimelineChart::defaultedToTotalRatio),
+                         Tuple.of("S pojištěním [% všech půjček]", SummaryTimelineChart::insuredToTotalRatio),
+                         Tuple.of("Bez příběhu [% všech půjček]", SummaryTimelineChart::unstoriedToTotalRatio));
     }
 
     @Override

@@ -30,11 +30,16 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
         super(data, processor);
     }
 
+    protected static boolean filterForFinished(final DataRow row) {
+        return row.getStatus().equals("Zesplatněno") || row.getStatus().equals("Zaplaceno");
+    }
+
     protected static void abstractInterestRateHealthBinary(final Stream<DataRow> data,
                                                            final Predicate<DataRow> firstFilter,
                                                            final Predicate<DataRow> sorter,
                                                            final XYZChartDataConsumer adder) {
-        final List<DataRow> allData = data.collect(toList());
+        Stream<DataRow> updatedData = data.filter(AbstractRiskXYZChart::filterForFinished);
+        final List<DataRow> allData = updatedData.collect(toList());
         final TreeMap<Ratio, TreeMap<Boolean, List<DataRow>>> byInterestRateAndSecondTotal =
                 allData.stream().collect(
                         collectingAndThen(
@@ -93,8 +98,9 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
     protected static void abstractRiskChartCustomSorted(final Stream<DataRow> data,
                                                         final Function<DataRow, CustomSortString> parameter,
                                                         final XYZChartDataConsumer adder) {
+        Stream<DataRow> updatedData = data.filter(AbstractRiskXYZChart::filterForFinished);
         final TreeMap<Ratio, TreeMap<CustomSortString, List<DataRow>>> byInterestRateAndSecond =
-                data.collect(
+                updatedData.collect(
                         collectingAndThen(
                                 groupingBy(DataRow::getInterestRate,
                                            collectingAndThen(
@@ -106,11 +112,11 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
         final Map<Ratio, Map<CustomSortString, LongAdder>> totals = new HashMap<>(0);
         final Map<Ratio, Map<CustomSortString, LongAdder>> defaultedTotals = new HashMap<>(0);
         byInterestRateAndSecond.forEach((ratio, sub) -> sub.forEach((second, rows) -> {
-            totals.computeIfAbsent(ratio, __ -> new HashMap<>())
+            totals.computeIfAbsent(ratio, __ -> new HashMap<>(0))
                     .computeIfAbsent(second, __ -> new LongAdder())
                     .add(rows.size());
             final long defaulted = rows.stream().filter(DataRow::isDefaulted).count();
-            defaultedTotals.computeIfAbsent(ratio, __ -> new HashMap<>())
+            defaultedTotals.computeIfAbsent(ratio, __ -> new HashMap<>(0))
                     .computeIfAbsent(second, __ -> new LongAdder())
                     .add(defaulted);
         }));
@@ -165,7 +171,7 @@ public abstract class AbstractRiskXYZChart extends AbstractXYZChart {
 
     @Override
     public String getLabelForZ() {
-        return "Zesplatněno z celku [%]";
+        return "Zesplatněno z ukončených [%]";
     }
 
     @Override

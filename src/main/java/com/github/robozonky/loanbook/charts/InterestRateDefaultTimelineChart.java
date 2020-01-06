@@ -13,7 +13,8 @@ public final class InterestRateDefaultTimelineChart extends AbstractTimelineXYZC
 
     private static void interestRateDefaultTimeline(final Stream<DataRow> data,
                                                     final XYZChartDataConsumer adder) {
-        abstractInterestRateHealthTimeline(data, DataRow::isDefaulted, adder);
+        final Stream<DataRow> updatedData = data.filter(AbstractRiskXYZChart::filterForFinished);
+        abstractInterestRateHealthTimeline(updatedData, DataRow::isDefaulted, adder);
     }
 
     @Override
@@ -28,7 +29,7 @@ public final class InterestRateDefaultTimelineChart extends AbstractTimelineXYZC
 
     @Override
     public String getLabelForZ() {
-        return "Zesplatněno z originovaných [%]";
+        return "Zesplatněno z ukončených [%]";
     }
 
     @Override

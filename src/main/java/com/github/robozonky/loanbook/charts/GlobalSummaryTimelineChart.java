@@ -24,10 +24,10 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
     }
 
     private static Number somethingToTotalRatio(final List<DataRow> data, final Predicate<DataRow> include) {
-        final long stories = data.stream()
+        final long included = data.stream()
                 .filter(include)
                 .count();
-        final BigDecimal ratio = BigDecimal.valueOf(stories)
+        final BigDecimal ratio = BigDecimal.valueOf(included)
                 .divide(BigDecimal.valueOf(data.size()), 4, RoundingMode.HALF_EVEN);
         return Ratio.getInstance(ratio);
     }
@@ -74,10 +74,6 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
         return somethingToTotalRatio(data, r-> !r.isStory());
     }
 
-    private static Number defaultedToTotalRatio(final List<DataRow> data) {
-        return somethingToTotalRatio(data, DataRow::isDefaulted);
-    }
-
     private static void storyAndInsuranceTimelineChart(final Stream<DataRow> data,
                                                        final XYZChartDataConsumer adder) {
         abstractGlobalTimeline(data, adder,
@@ -86,9 +82,8 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
                          Tuple.of("Počtem vážený průměrný úrok [% p.a.]",
                                   GlobalSummaryTimelineChart::countWeightedInterestRate),
                          Tuple.of("Ztraceno [% objemu]", GlobalSummaryTimelineChart::lostToTotalRatio),
-                         Tuple.of("Zesplatněno [% půjček]", GlobalSummaryTimelineChart::defaultedToTotalRatio),
-                         Tuple.of("S pojištěním [% půjček]", GlobalSummaryTimelineChart::insuredToTotalRatio),
-                         Tuple.of("Bez příběhu [% půjček]", GlobalSummaryTimelineChart::unstoriedToTotalRatio));
+                         Tuple.of("S pojištěním [% všech půjček]", GlobalSummaryTimelineChart::insuredToTotalRatio),
+                         Tuple.of("Bez příběhu [% všech půjček]", GlobalSummaryTimelineChart::unstoriedToTotalRatio));
     }
 
     @Override
@@ -118,6 +113,6 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
 
     @Override
     public Optional<String> getComment() {
-        return Optional.of("Do daného měsíce počítáme všechny v tu dobu aktivní půjčky v platformě.");
+        return Optional.of("Křivka zesplatnění chybí, neboť v pozdějších měsících ukazuje velmi zavádějící data. (Ukončené = zesplatněné, tedy míra zesplatnění 100 %).");
     }
 }
