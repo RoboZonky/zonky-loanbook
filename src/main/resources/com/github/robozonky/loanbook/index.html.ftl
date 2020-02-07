@@ -28,20 +28,23 @@
             <li>Provozovatelem této stránky jsem já, <a href="https://www.petrovicky.net/">Lukáš Petrovický</a>, autor <a href="https://www.robozonky.cz/">investičního robota RoboZonky</a>. Nejsem žádný velký grafik a hlavně mě uživatelská rozhraní nebaví. <strong>Chcete-li pomoci tuto stránku nastylovat, ozvěte se.</strong></li>
             <li>Ozvěte se také pokud si myslíte, že tu ještě nějaký graf chybí. Občas ve volném čase nějaký přidám.</li>
         </ul>
+
         <h2>Dostupné grafy</h2>
         <ul>
         <#list data.charts as chart>
             <li><a href="#<@htmlId chart />">${chart.getTitle()}</a></li>
         </#list>
         </ul>
+
         <h2>A teď už vážně</h2>
         <#list data.charts as chart>
             <@chartMeta chart />
         </#list>
+
         <h2 id="changes">Změny a novinky</h2>
         <dl>
             <dt>7. 2. 2020: Nové grafy</dt>
-                <dd>Přidal jsem grafyk objemu a počtu půjček v čase, podle úrokové míry.</dd>
+                <dd>Přidal jsem grafy k objemu a počtu půjček v čase, podle úrokové míry.</dd>
             <dt>6. 1. 2020: Změna grafů o zesplatněnosti</dt>
                 <dd>Většina grafů týkajících se zesplatněnosti nově jako základ používá pouze půjčky ukončené. Vyhneme se tím zkreslení, kdy rostoucí tempo přírůstku nových zdravých půjček mohlo zakrývat potenciálně vzrůstající zesplatněnost.</dd>
                 <dd>Kromě toho jsem nově rozdělil délky úvěru po 6 měsících namísto původních 12.</dd>
