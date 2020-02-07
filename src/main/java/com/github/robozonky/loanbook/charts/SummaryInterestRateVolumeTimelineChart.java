@@ -1,7 +1,5 @@
 package com.github.robozonky.loanbook.charts;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
@@ -20,19 +18,17 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
-public final class SummaryInterestRateTimelineChart extends AbstractTimelineXYZChart {
+public final class SummaryInterestRateVolumeTimelineChart extends AbstractTimelineXYZChart {
 
-    public SummaryInterestRateTimelineChart(final Data data) {
-        super(data, SummaryInterestRateTimelineChart::interestRateDefaultTimeline);
+    public SummaryInterestRateVolumeTimelineChart(final Data data) {
+        super(data, SummaryInterestRateVolumeTimelineChart::interestRateDefaultTimeline);
     }
 
     private static Number convert(final Ratio ratio, final List<DataRow> rows) {
-        final long total = rows.size();
-        final long part = rows.stream().filter(r -> r.getInterestRate().equals(ratio)).count();
-        return BigDecimal.valueOf(part)
-                .divide(BigDecimal.valueOf(total), 4, RoundingMode.HALF_EVEN)
-                .multiply(BigDecimal.TEN)
-                .multiply(BigDecimal.TEN);
+        return rows.stream()
+                .filter(r -> r.getInterestRate().equals(ratio))
+                .map(r -> r.getAmount().doubleValue() / 1_000_000.0)
+                .reduce(0.0, Double::sum);
     }
 
     private static Tuple2<String, Function<List<DataRow>, Number>> convert(final Ratio ratio) {
@@ -49,7 +45,7 @@ public final class SummaryInterestRateTimelineChart extends AbstractTimelineXYZC
                                 TreeMap::new
                         ));
         final Tuple2<String, Function<List<DataRow>, Number>>[] series = all.keySet().stream()
-                .map(SummaryInterestRateTimelineChart::convert)
+                .map(SummaryInterestRateVolumeTimelineChart::convert)
                 .toArray((IntFunction<Tuple2<String, Function<List<DataRow>, Number>>[]>) Tuple2[]::new);
         abstractOriginationTimeline(all.values().stream().flatMap(Collection::stream), adder, series);
     }
@@ -76,11 +72,11 @@ public final class SummaryInterestRateTimelineChart extends AbstractTimelineXYZC
 
     @Override
     public String getLabelForZ() {
-        return "Podíl počtu na celku [%]";
+        return "Objem [mio. Kč]";
     }
 
     @Override
     public String getTitle() {
-        return "Skladba úrokových měr v čase";
+        return "Objem půjček v čase";
     }
 }
