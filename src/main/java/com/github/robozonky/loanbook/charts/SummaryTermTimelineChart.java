@@ -26,8 +26,7 @@ public final class SummaryTermTimelineChart extends AbstractTimelineXYZChart {
     }
 
     private static CustomSortString categorize(final DataRow row) {
-        final CustomSortString original = TermRiskChart.getCategory(row);
-        return new CustomSortString(original+ " měs.", original.sortId);
+        return TermRiskChart.getCategory(row);
     }
 
     private static Number convert(final CustomSortString category, final List<DataRow> rows) {

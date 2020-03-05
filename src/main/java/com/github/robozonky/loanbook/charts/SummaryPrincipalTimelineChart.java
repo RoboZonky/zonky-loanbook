@@ -26,8 +26,7 @@ public final class SummaryPrincipalTimelineChart extends AbstractTimelineXYZChar
     }
 
     private static CustomSortString categorize(final DataRow row) {
-        final CustomSortString original = PrincipalRiskChart.getCategory(row);
-        return new CustomSortString( original+ " tis. Kč", original.sortId);
+        return PrincipalRiskChart.getCategory(row);
     }
 
     private static Number convert(final CustomSortString category, final List<DataRow> rows) {

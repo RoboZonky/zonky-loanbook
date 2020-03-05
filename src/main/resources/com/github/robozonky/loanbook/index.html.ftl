@@ -43,6 +43,8 @@
 
         <h2 id="changes">Změny a novinky</h2>
         <dl>
+            <dt>5. 3. 2020: Informativní osy</dt>
+                <dd>Upravil jsem intervaly na osách délky a výše půjčky tak, aby bylo zřejmé, ze které strany jsou tyto intervaly uzavřené.</dd>
             <dt>7. 2. 2020: Nové grafy</dt>
                 <dd>Přidal jsem grafy k objemu a počtu půjček v čase, podle úrokové míry.</dd>
             <dt>6. 1. 2020: Změna grafů o zesplatněnosti</dt>
