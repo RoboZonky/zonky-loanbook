@@ -21,13 +21,12 @@ public final class TermRiskChart extends AbstractRiskXYZChart {
     }
 
     public static CustomSortString getCategory(final int originalInstalmentCount) {
-        final int step = 6;
-        final int cycle = (originalInstalmentCount - 1) / step;
-        final int leftBoundInclusive = (cycle * step) + 1;
-        final int rightBoundInclusive = ((cycle + 1) * step);
-        if (cycle == 0) {
-            return new CustomSortString("do " + rightBoundInclusive + " měs.", cycle);
-        } else if (cycle > 12) {
+        final int minimum = 6; // There are no loans shorter than 6 months.
+        final int step = 6; // New category every 6 months.
+        final int cycle = (originalInstalmentCount - 1 - minimum) / step;
+        final int leftBoundInclusive = cycle == 0 ? minimum : (cycle * step) + step + 1;
+        final int rightBoundInclusive = ((cycle + 1) * step) + step;
+        if (cycle > 11) {
             return new CustomSortString("od " + leftBoundInclusive + " měs.", cycle);
         } else {
             return new CustomSortString(leftBoundInclusive + " až " + rightBoundInclusive + " měs.", cycle);
