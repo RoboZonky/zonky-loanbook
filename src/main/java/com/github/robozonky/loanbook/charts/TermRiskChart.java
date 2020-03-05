@@ -17,8 +17,12 @@ public final class TermRiskChart extends AbstractRiskXYZChart {
     }
 
     public static CustomSortString getCategory(final DataRow r) {
+        return getCategory(r.getOriginalInstalmentCount());
+    }
+
+    public static CustomSortString getCategory(final int originalInstalmentCount) {
         final int step = 6;
-        final int cycle = (r.getOriginalInstalmentCount() - 1) / step;
+        final int cycle = (originalInstalmentCount - 1) / step;
         final int leftBoundInclusive = (cycle * step) + 1;
         final int rightBoundInclusive = ((cycle + 1) * step);
         if (cycle == 0) {

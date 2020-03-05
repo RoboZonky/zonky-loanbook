@@ -13,6 +13,7 @@ import com.github.robozonky.loanbook.charts.InsuranceRiskChart;
 import com.github.robozonky.loanbook.charts.InterestRateDefaultRatesTimelineChart;
 import com.github.robozonky.loanbook.charts.InterestRateDefaultTimelineChart;
 import com.github.robozonky.loanbook.charts.InvestorRiskChart;
+import com.github.robozonky.loanbook.charts.NormalizedTermRiskChart;
 import com.github.robozonky.loanbook.charts.PreviousLoansRiskChart;
 import com.github.robozonky.loanbook.charts.PrincipalRiskChart;
 import com.github.robozonky.loanbook.charts.PurposeRiskChart;
@@ -72,6 +73,7 @@ public class Main {
         template.addXYZChart(IncomeTypeRiskChart::new);
         template.addXYZChart(PrincipalRiskChart::new);
         template.addXYZChart(TermRiskChart::new);
+        template.addXYZChart(NormalizedTermRiskChart::new);
         template.addXYZChart(StoryRiskChart::new);
         template.addXYZChart(InsuranceRiskChart::new);
         template.addXYZChart(InvestorRiskChart::new);
