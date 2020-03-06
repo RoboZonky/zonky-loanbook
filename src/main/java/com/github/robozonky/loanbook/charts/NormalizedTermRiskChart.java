@@ -116,13 +116,13 @@ public final class NormalizedTermRiskChart extends AbstractRiskXYZChart {
     }
 
     private static double normalizeDefaultRate(final int currentPeriodInMonths, final double rate) {
-        return (rate / currentPeriodInMonths) * 12; // Probability of default for a 1-year loan of a given default rate.
+        return (rate / currentPeriodInMonths) * 12; // Probability of default per year.
     }
 
 
     @Override
     public String getLabelForZ() {
-        return "Předpokládáno zesplatněných [%]";
+        return "Odhad zesplatněných ročně [%]";
     }
 
     @Override
@@ -132,15 +132,14 @@ public final class NormalizedTermRiskChart extends AbstractRiskXYZChart {
 
     @Override
     public String getTitle() {
-        return "Rizikovost podle délky úvěru, normalizovaná na 84 měsíců";
+        return "Normalizovaná rizikovost podle délky úvěru";
     }
 
     @Override
     public Optional<String> getComment() {
-        return Optional.of("V tomto grafu nezáleží na konkrétních číslech, ale na jejich vzájemném poměru. " +
-                "Půjčka na 6 měsíců sice v absolutních číslech může být bezpečnější, než půjčka na 84 měsíců. " +
-                "Ale během těch 84 měsíců dostanete do portfolia 14 různých půjček na 6 měsíců; pravděpodobnost " +
-                "zesplatnění jedné z nich tedy roste a postupně převýší pravděpodobnost zesplatnění jedné půjčky na " +
-                "84 měsíců.");
+        return Optional.of("Půjčka na 6 měsíců v absolutních číslech může být bezpečnější, než půjčka na 84 měsíců. " +
+                "Ale během těch 84 měsíců dostanete do portfolia 14 různých půjček na 6 měsíců; " +
+                "pravděpodobnost zesplatnění alespoň jedné z nich tedy roste " +
+                "a postupně převýší pravděpodobnost zesplatnění jedné půjčky na 84 měsíců.");
     }
 }
