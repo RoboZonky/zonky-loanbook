@@ -103,15 +103,11 @@ public final class NormalizedTermRiskChart extends AbstractRiskXYZChart {
         normalizedCategorized.forEach((rating, sub) -> sub.forEach((term, ratios) -> {
             Collections.sort(ratios);
             final int size = ratios.size();
-            double median;
-            if (size % 2 == 1) {
-                median = ratios.get(size / 2);
-            } else {
-                final double a = ratios.get(size / 2);
-                final double b = ratios.get(size / 2 - 1);
-                median = (a + b) / 2;
-            }
-            adder.accept(Tuple.of(term.toString(), rating + " p.a.", median * 100.0));
+            final double sum = ratios.stream()
+                    .mapToDouble(d -> d)
+                    .sum();
+            final double average = sum / size;
+            adder.accept(Tuple.of(term.toString(), rating + " p.a.", average * 100.0));
         }));
     }
 
