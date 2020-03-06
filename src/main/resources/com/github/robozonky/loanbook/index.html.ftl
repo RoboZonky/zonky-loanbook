@@ -43,7 +43,7 @@
 
         <h2 id="changes">Změny a novinky</h2>
         <dl>
-            <dt>6. 3. 2020: Normalizovaný graf zesplatněnosti</dt>
+            <dt>6. 3. 2020: Graf normalizované rizikovosti</dt>
                 <dd>A kromě toho ještě další drobná úprava na ose délky půjčky.</dd>
             <dt>5. 3. 2020: Informativní osy</dt>
                 <dd>Upravil jsem intervaly na osách délky a výše půjčky tak, aby bylo zřejmé, ze které strany jsou tyto intervaly uzavřené.</dd>

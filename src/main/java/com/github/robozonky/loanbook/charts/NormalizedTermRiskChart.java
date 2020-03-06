@@ -127,7 +127,7 @@ public final class NormalizedTermRiskChart extends AbstractRiskXYZChart {
 
     @Override
     public String getLabelForX() {
-        return "Délka úvěrů";
+        return "Délka úvěru";
     }
 
     @Override
