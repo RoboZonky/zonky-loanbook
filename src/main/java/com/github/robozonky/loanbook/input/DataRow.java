@@ -39,6 +39,8 @@ public final class DataRow {
     private final YearMonth becameInvestor;
     private final boolean story;
     private final int investmentCount;
+    private final YearMonth expectedFirstPaymentMonth;
+    private final String label;
 
     DataRow(final YearMonth reportDate, final String userId, final String region, final String incomeType,
             final boolean additionalIncome, final String purpose, final Ratio interestRate, final Money amount,
@@ -49,7 +51,8 @@ public final class DataRow {
             final int originalInstalmentCount, final int currentInstalmentCount, final int remainingInstalmentCount,
             final Ratio lost, final YearMonth finished, final Money principalPaidAmount, final Money interestPaidAmount,
             final Money penaltyPaidAmount, final Money principalRemainingAmount, final Money interestRemainingAmount,
-            final YearMonth becameInvestor, final boolean story, final int investmentCount) {
+            final YearMonth becameInvestor, final boolean story, final int investmentCount,
+            final YearMonth expectedFirstPaymentMonth, final String label) {
         this.reportDate = reportDate;
         this.userId = userId;
         this.region = region;
@@ -84,6 +87,8 @@ public final class DataRow {
         this.becameInvestor = becameInvestor;
         this.story = story;
         this.investmentCount = investmentCount;
+        this.expectedFirstPaymentMonth = expectedFirstPaymentMonth;
+        this.label = label;
     }
 
     public YearMonth getReportDate() {
@@ -220,6 +225,14 @@ public final class DataRow {
 
     public int getInvestmentCount() {
         return investmentCount;
+    }
+
+    public YearMonth getExpectedFirstPaymentMonth() {
+        return expectedFirstPaymentMonth;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     @Override

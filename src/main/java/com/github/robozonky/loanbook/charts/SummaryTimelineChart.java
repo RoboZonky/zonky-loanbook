@@ -90,7 +90,7 @@ public final class SummaryTimelineChart extends AbstractTimelineXYZChart {
                                   SummaryTimelineChart::countWeightedInterestRate),
                          Tuple.of("Ztraceno [% objemu]", SummaryTimelineChart::lostToTotalRatio),
                          Tuple.of("Zesplatněno [% ukončených půjček]", SummaryTimelineChart::defaultedToTotalRatio),
-                         Tuple.of("S pojištěním [% všech půjček]", SummaryTimelineChart::insuredToTotalRatio),
+                         Tuple.of("S pojištěním [% aktivních půjček]", SummaryTimelineChart::insuredToTotalRatio),
                          Tuple.of("Bez příběhu [% všech půjček]", SummaryTimelineChart::unstoriedToTotalRatio));
     }
 

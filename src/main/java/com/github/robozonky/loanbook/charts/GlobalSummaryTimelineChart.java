@@ -82,7 +82,7 @@ public final class GlobalSummaryTimelineChart extends AbstractTimelineXYZChart {
                          Tuple.of("Počtem vážený průměrný úrok [% p.a.]",
                                   GlobalSummaryTimelineChart::countWeightedInterestRate),
                          Tuple.of("Ztraceno [% objemu]", GlobalSummaryTimelineChart::lostToTotalRatio),
-                         Tuple.of("S pojištěním [% všech půjček]", GlobalSummaryTimelineChart::insuredToTotalRatio),
+                         Tuple.of("S pojištěním [% aktivních půjček]", GlobalSummaryTimelineChart::insuredToTotalRatio),
                          Tuple.of("Bez příběhu [% všech půjček]", GlobalSummaryTimelineChart::unstoriedToTotalRatio));
     }
 

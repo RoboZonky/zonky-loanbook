@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.github.robozonky.loanbook.charts.GlobalSummaryTimelineChart;
 import com.github.robozonky.loanbook.charts.IncomeTypeRiskChart;
-import com.github.robozonky.loanbook.charts.InsuranceRiskChart;
 import com.github.robozonky.loanbook.charts.InterestRateDefaultRatesTimelineChart;
 import com.github.robozonky.loanbook.charts.InterestRateDefaultTimelineChart;
 import com.github.robozonky.loanbook.charts.InvestorRiskChart;
@@ -75,7 +74,6 @@ public class Main {
         template.addXYZChart(TermRiskChart::new);
         template.addXYZChart(NormalizedTermRiskChart::new);
         template.addXYZChart(StoryRiskChart::new);
-        template.addXYZChart(InsuranceRiskChart::new);
         template.addXYZChart(InvestorRiskChart::new);
         template.addXYZChart(PreviousLoansRiskChart::new);
         // line charts

@@ -43,6 +43,9 @@
 
         <h2 id="changes">Změny a novinky</h2>
         <dl>
+            <dt>10. 6. 2020: Odstraněn graf o zesplatněnosti pojištěných</dt>
+                <dd>Zonky nově poskytuje data o pojištění pouze u půjček, které nejsou zesplatněny.</dd>
+                <dd>V datech za duben tento graf zobrazoval chybné údaje.</dd>
             <dt>6. 3. 2020: Graf normalizované rizikovosti</dt>
                 <dd>A kromě toho ještě další drobná úprava na ose délky půjčky.</dd>
             <dt>5. 3. 2020: Informativní osy</dt>

@@ -123,7 +123,9 @@ public class DataProcessor {
                     toMoney(sheetRow[30]),
                     toYearMonth(sheetRow[31]),
                     toBoolean(sheetRow[32]),
-                    toInt(sheetRow[33]));
+                    toInt(sheetRow[33]),
+                    toYearMonth(sheetRow[34]),
+                    deduplicate(sheetRow[35]));
             rows.add(row);
         } catch (final Exception ex) {
             LOGGER.warn("Failed processing {}.", sheetRow, ex);
