@@ -24,7 +24,7 @@
   <name>Zonky Loanbook Statistics Generator</name>
 
   <properties>
-    <version.org.apache.logging.log4j>2.13.1</version.org.apache.logging.log4j>
+    <version.org.apache.logging.log4j>2.13.3</version.org.apache.logging.log4j>
   </properties>
 
   <dependencies>
