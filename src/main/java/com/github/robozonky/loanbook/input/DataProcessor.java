@@ -54,6 +54,19 @@ public class DataProcessor {
         }
     }
 
+    private static Insurance toInsurance(final String value) {
+        switch (value) {
+            case "Ano":
+                return Insurance.YES;
+            case "V minulosti":
+                return Insurance.IN_THE_PAST;
+            case "Ne":
+                return Insurance.NO;
+            default:
+                throw new IllegalStateException("Wrong boolean value:" + value);
+        }
+    }
+
     private static int toInt(final String value) {
         return (int) toDouble(value);
     }
@@ -100,7 +113,7 @@ public class DataProcessor {
                     toMoney(sheetRow[7]),
                     toYearMonth(sheetRow[8]),
                     toInt(sheetRow[9]),
-                    toBoolean(sheetRow[10]),
+                    toInsurance(sheetRow[10]),
                     deduplicate(sheetRow[11]),
                     toMoney(sheetRow[12]),
                     toInt(sheetRow[13]),

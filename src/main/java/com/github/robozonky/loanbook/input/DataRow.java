@@ -15,7 +15,7 @@ public final class DataRow {
     private final Money amount;
     private final YearMonth origin;
     private final int loanCount;
-    private final boolean insured;
+    private final Insurance insured;
     private final String status;
     private final Money paidEarlyAmount;
     private final int postponedInstalmentCount;
@@ -44,7 +44,7 @@ public final class DataRow {
 
     DataRow(final YearMonth reportDate, final String userId, final String region, final String incomeType,
             final boolean additionalIncome, final String purpose, final Ratio interestRate, final Money amount,
-            final YearMonth origin, final int loanCount, final boolean insured, final String status,
+            final YearMonth origin, final int loanCount, final Insurance insured, final String status,
             final Money paidEarlyAmount, final int postponedInstalmentCount, final int daysPastDue,
             final Money amountOverdue, final YearMonth lastDelinquent, final int maxDaysPastDue,
             final int lateInstalmentCount, final Money maxAmountOverdue, final boolean defaulted,
@@ -132,7 +132,7 @@ public final class DataRow {
     }
 
     public boolean isInsured() {
-        return insured;
+        return insured == Insurance.YES;
     }
 
     public String getStatus() {
