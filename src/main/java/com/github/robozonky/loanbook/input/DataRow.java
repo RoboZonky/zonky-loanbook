@@ -2,6 +2,7 @@ package com.github.robozonky.loanbook.input;
 
 import java.time.YearMonth;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 public final class DataRow {
 
@@ -41,6 +42,7 @@ public final class DataRow {
     private final int investmentCount;
     private final YearMonth expectedFirstPaymentMonth;
     private final String label;
+    private final YearMonth monthOfDefault;
 
     DataRow(final YearMonth reportDate, final String userId, final String region, final String incomeType,
             final boolean additionalIncome, final String purpose, final Ratio interestRate, final Money amount,
@@ -52,7 +54,7 @@ public final class DataRow {
             final Ratio lost, final YearMonth finished, final Money principalPaidAmount, final Money interestPaidAmount,
             final Money penaltyPaidAmount, final Money principalRemainingAmount, final Money interestRemainingAmount,
             final YearMonth becameInvestor, final boolean story, final int investmentCount,
-            final YearMonth expectedFirstPaymentMonth, final String label) {
+            final YearMonth expectedFirstPaymentMonth, final String label, final YearMonth monthOfDefault) {
         this.reportDate = reportDate;
         this.userId = userId;
         this.region = region;
@@ -89,6 +91,7 @@ public final class DataRow {
         this.investmentCount = investmentCount;
         this.expectedFirstPaymentMonth = expectedFirstPaymentMonth;
         this.label = label;
+        this.monthOfDefault = monthOfDefault;
     }
 
     public YearMonth getReportDate() {
@@ -235,41 +238,50 @@ public final class DataRow {
         return label;
     }
 
+    public YearMonth getMonthOfDefault() {
+        return monthOfDefault;
+    }
+
     @Override
     public String toString() {
-        return "DataRow{" +
-                "amount=" + amount +
-                ", amountOverdue=" + amountOverdue +
-                ", becameInvestor=" + becameInvestor +
-                ", currentInstalmentCount=" + currentInstalmentCount +
-                ", daysPastDue=" + daysPastDue +
-                ", defaulted=" + defaulted +
-                ", finished=" + finished +
-                ", incomeType='" + incomeType + '\'' +
-                ", insured=" + insured +
-                ", interestPaidAmount=" + interestPaidAmount +
-                ", interestRate=" + interestRate +
-                ", interestRemainingAmount=" + interestRemainingAmount +
-                ", investmentCount=" + investmentCount +
-                ", lastDelinquent=" + lastDelinquent +
-                ", lateInstalmentCount=" + lateInstalmentCount +
-                ", loanCount=" + loanCount +
-                ", lost=" + lost +
-                ", maxAmountOverdue=" + maxAmountOverdue +
-                ", maxDaysPastDue=" + maxDaysPastDue +
-                ", origin=" + origin +
-                ", originalInstalmentCount=" + originalInstalmentCount +
-                ", paidEarlyAmount=" + paidEarlyAmount +
-                ", penaltyPaidAmount=" + penaltyPaidAmount +
-                ", postponedInstalmentCount=" + postponedInstalmentCount +
-                ", principalPaidAmount=" + principalPaidAmount +
-                ", principalRemainingAmount=" + principalRemainingAmount +
-                ", purpose='" + purpose + '\'' +
-                ", region='" + region + '\'' +
-                ", remainingInstalmentCount=" + remainingInstalmentCount +
-                ", status='" + status + '\'' +
-                ", story=" + story +
-                ", userId='" + userId + '\'' +
-                '}';
+        return new StringJoiner(", ", DataRow.class.getSimpleName() + "[", "]")
+                .add("additionalIncome=" + additionalIncome)
+                .add("amount=" + amount)
+                .add("amountOverdue=" + amountOverdue)
+                .add("becameInvestor=" + becameInvestor)
+                .add("currentInstalmentCount=" + currentInstalmentCount)
+                .add("daysPastDue=" + daysPastDue)
+                .add("defaulted=" + defaulted)
+                .add("expectedFirstPaymentMonth=" + expectedFirstPaymentMonth)
+                .add("finished=" + finished)
+                .add("incomeType='" + incomeType + "'")
+                .add("insured=" + insured)
+                .add("interestPaidAmount=" + interestPaidAmount)
+                .add("interestRate=" + interestRate)
+                .add("interestRemainingAmount=" + interestRemainingAmount)
+                .add("investmentCount=" + investmentCount)
+                .add("label='" + label + "'")
+                .add("lastDelinquent=" + lastDelinquent)
+                .add("lateInstalmentCount=" + lateInstalmentCount)
+                .add("loanCount=" + loanCount)
+                .add("lost=" + lost)
+                .add("maxAmountOverdue=" + maxAmountOverdue)
+                .add("maxDaysPastDue=" + maxDaysPastDue)
+                .add("monthOfDefault=" + monthOfDefault)
+                .add("origin=" + origin)
+                .add("originalInstalmentCount=" + originalInstalmentCount)
+                .add("paidEarlyAmount=" + paidEarlyAmount)
+                .add("penaltyPaidAmount=" + penaltyPaidAmount)
+                .add("postponedInstalmentCount=" + postponedInstalmentCount)
+                .add("principalPaidAmount=" + principalPaidAmount)
+                .add("principalRemainingAmount=" + principalRemainingAmount)
+                .add("purpose='" + purpose + "'")
+                .add("region='" + region + "'")
+                .add("remainingInstalmentCount=" + remainingInstalmentCount)
+                .add("reportDate=" + reportDate)
+                .add("status='" + status + "'")
+                .add("story=" + story)
+                .add("userId='" + userId + "'")
+                .toString();
     }
 }
