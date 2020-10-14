@@ -139,7 +139,7 @@ public class DataProcessor {
                     toInt(sheetRow[33]),
                     toYearMonth(sheetRow[34]),
                     deduplicate(sheetRow[35]),
-                    toYearMonth(sheetRow[36]));
+                    sheetRow.length > 36 ? toYearMonth(sheetRow[36]) : null);
             rows.add(row);
         } catch (final Exception ex) {
             LOGGER.warn("Failed processing {}.", sheetRow, ex);

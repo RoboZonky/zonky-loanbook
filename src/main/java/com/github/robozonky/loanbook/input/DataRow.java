@@ -238,8 +238,8 @@ public final class DataRow {
         return label;
     }
 
-    public YearMonth getMonthOfDefault() {
-        return monthOfDefault;
+    public Optional<YearMonth> getMonthOfDefault() {
+        return Optional.ofNullable(monthOfDefault);
     }
 
     @Override
