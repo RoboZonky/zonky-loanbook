@@ -1,14 +1,13 @@
 package com.github.robozonky.loanbook;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
+import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 final class XLSXConverter implements Consumer<InputStream> {
 
@@ -20,7 +19,7 @@ final class XLSXConverter implements Consumer<InputStream> {
         this.rowProcessor = rowProcessor;
     }
 
-    private String[] processRow(Row row) {
+    private String[] adaptRow(Row row) {
         var lastCellNum = row.getLastCellNum();
         var rowCells = new String[lastCellNum + 1];
         for (int colId = 0; colId <= lastCellNum; colId++) {
@@ -33,16 +32,19 @@ final class XLSXConverter implements Consumer<InputStream> {
 
     @Override
     public void accept(final InputStream inputStream) {
-        try (final XSSFWorkbook workbook = new XSSFWorkbook(inputStream)) {
-            LOGGER.debug("Workbook loaded.");
-            var sheet = workbook.getSheet("data");
-            var numRows = sheet.getPhysicalNumberOfRows();
-            for (int rowId = 1; rowId < numRows; rowId++) { // row 0 is just headers
-                String[] row = processRow(sheet.getRow(rowId));
-                rowProcessor.accept(row);
+        var workbook = StreamingReader.builder()
+                .rowCacheSize(100)
+                .bufferSize(4096)
+                .open(inputStream);
+        LOGGER.debug("Workbook loaded.");
+        var sheet = workbook.getSheet("data");
+        boolean isFirstRow = true;
+        for (Row r : sheet) {
+            if (isFirstRow) { // Skip first row, which is just headers.
+                isFirstRow = false;
+                continue;
             }
-        } catch (final IOException ex) {
-            throw new IllegalStateException(ex);
+            rowProcessor.accept(adaptRow(r));
         }
     }
 }
