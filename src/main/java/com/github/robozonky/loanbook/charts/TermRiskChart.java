@@ -26,7 +26,7 @@ public final class TermRiskChart extends AbstractRiskXYZChart {
         final int cycle = (originalInstalmentCount - 1 - minimum) / step;
         final int leftBoundInclusive = cycle == 0 ? minimum : (cycle * step) + step + 1;
         final int rightBoundInclusive = ((cycle + 1) * step) + step;
-        if (cycle > 11) {
+        if (cycle > 17) {
             return new CustomSortString("od " + leftBoundInclusive + " měs.", cycle);
         } else {
             return new CustomSortString(leftBoundInclusive + " až " + rightBoundInclusive + " měs.", cycle);

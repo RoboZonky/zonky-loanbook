@@ -15,7 +15,7 @@ public final class PrincipalRiskChart extends AbstractRiskXYZChart {
         final int end = ((cycle + 1) * step) / 1000;
         if (cycle == 0) {
             return new CustomSortString("do " + end + " 000,- Kč", cycle);
-        } else if (cycle > 13) {
+        } else if (cycle > 17) {
             return new CustomSortString("od " + start + " 001,- Kč", cycle);
         } else {
             return new CustomSortString(start + " 001,- až " + end + " 000,- Kč", cycle);

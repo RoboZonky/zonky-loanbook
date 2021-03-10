@@ -24,7 +24,7 @@
         <ul>
             <li>Tato stránka poskytuje vizualizaci dat z loanbooku investiční platformy Zonky. Mějte na paměti, že <strong>může obsahovat chyby</strong>, nikdo není neomylný. Na konci stránky najdete <a href="#changes">seznam změn</a>.</li>
             <li>Stránka aktualizována nahodile, zpravidla jednou za měsíc. Poslední aktualizace proběhla ${data.now?date} v ${data.now?time}.</li>
-            <li>Zdrojová data jsou ke stažení na stránce <a href="https://zonky.cz/risk/">Jak se splácí půjčky na Zonky</a>.</li>
+            <li>Zdrojová data jsou ke stažení na stránce <a href="https://zonky.cz/risk/">Riskový přehled na Zonky</a>, kde najdete i další užitečné (oficiální) přehledy.</li>
             <li>Provozovatelem této stránky jsem já, <a href="https://www.petrovicky.net/">Lukáš Petrovický</a>, autor <a href="https://www.robozonky.cz/">investičního robota RoboZonky</a>. Nejsem žádný velký grafik a hlavně mě uživatelská rozhraní nebaví. <strong>Chcete-li pomoci tuto stránku nastylovat, ozvěte se.</strong></li>
             <li>Ozvěte se také pokud si myslíte, že tu ještě nějaký graf chybí. Občas ve volném čase nějaký přidám.</li>
         </ul>
@@ -43,6 +43,7 @@
 
         <h2 id="changes">Změny a novinky</h2>
         <dl>
+            <dt>10. 3. 2021: Příprava na nové délky a maximální výše úvěrů</dt>
             <dt>10. 6. 2020: Odstraněn graf o zesplatněnosti pojištěných</dt>
                 <dd>Zonky nově poskytuje data o pojištění pouze u půjček, které nejsou zesplatněny.</dd>
                 <dd>V datech za duben tento graf zobrazoval chybné údaje.</dd>
