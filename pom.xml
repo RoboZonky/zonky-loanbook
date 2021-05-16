@@ -36,17 +36,17 @@
     <dependency>
       <groupId>com.monitorjbl</groupId>
       <artifactId>xlsx-streamer</artifactId>
-      <version>2.1.0</version> <!-- Required as plain POI is incredibly memory hungry. -->
+      <version>2.2.0</version> <!-- Required as plain POI is incredibly memory hungry. -->
     </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>4.0.0</version> <!-- Required by the xlsx-streamer. -->
+      <version>4.1.1</version> <!-- Required by the xlsx-streamer. -->
     </dependency>
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-      <version>2.3.29</version>
+      <version>2.3.30</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
