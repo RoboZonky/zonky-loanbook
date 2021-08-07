@@ -36,7 +36,7 @@
     <dependency>
       <groupId>com.monitorjbl</groupId>
       <artifactId>xlsx-streamer</artifactId>
-      <version>2.1.0</version> <!-- Required as plain POI is incredibly memory hungry. -->
+      <version>2.2.0</version> <!-- Required as plain POI is incredibly memory hungry. -->
     </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
